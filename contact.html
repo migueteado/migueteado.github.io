@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact · Miguel Villalobos</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* ── PAGE HEADER ── */
+      .page-header {
+        padding: 4rem 1.25rem 3rem;
+        max-width: 860px;
+        margin: 0 auto;
+      }
+      @media (min-width: 640px) {
+        .page-header {
+          padding: 5rem 2rem 3.5rem;
+        }
+      }
+      @media (min-width: 900px) {
+        .page-header {
+          padding: 5rem 2.5rem 3.5rem;
+        }
+      }
+
+      .page-title {
+        font-family: "Inter", sans-serif;
+        font-weight: 800;
+        font-size: clamp(2.2rem, 7vw, 3.5rem);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        margin-bottom: 1rem;
+      }
+      .page-subtitle {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.8;
+        max-width: 480px;
+      }
+
+      /* ── CONTENT ── */
+      .contact-content {
+        padding: 0 1.25rem;
+        max-width: 860px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+      @media (min-width: 640px) {
+        .contact-content {
+          padding: 0 2rem;
+        }
+      }
+      @media (min-width: 900px) {
+        .contact-content {
+          padding: 0 2.5rem;
+        }
+      }
+
+      /* ── AVAILABILITY CARD ── */
+      .avail-card {
+        background: var(--surface);
+        border: 1px solid rgba(167, 139, 250, 0.25);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        background: linear-gradient(
+          135deg,
+          rgba(167, 139, 250, 0.06) 0%,
+          var(--surface) 60%
+        );
+      }
+      .avail-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--accent3);
+        animation: pulse 2.5s ease-in-out infinite;
+        flex-shrink: 0;
+        margin-top: 0.35rem;
+      }
+      .avail-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--accent);
+        margin-bottom: 0.2rem;
+      }
+      .avail-desc {
+        font-size: 0.9rem;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      /* ── SOCIAL LINKS ── */
+      .social-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      @media (min-width: 480px) {
+        .social-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .social-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        transition:
+          border-color 0.2s,
+          background 0.2s,
+          transform 0.2s;
+      }
+      .social-card:hover {
+        border-color: rgba(167, 139, 250, 0.35);
+        background: var(--surface2);
+        transform: translateY(-2px);
+      }
+      .social-card:hover .social-arrow {
+        color: var(--accent);
+        transform: translate(2px, -2px);
+      }
+      .social-card:hover .social-name {
+        color: var(--accent);
+      }
+
+      .social-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .social-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text);
+        transition: color 0.2s;
+      }
+      .social-arrow {
+        color: var(--muted);
+        font-size: 1rem;
+        transition: all 0.2s;
+      }
+      .social-value {
+        font-family: "DM Mono", monospace;
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-bg"></div>
+
+    <nav>
+      <a href="index.html" class="nav-logo">&gt;_</a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="experience.html">Experience</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
+      </ul>
+      <div class="nav-status">
+        <div class="status-dot"></div>
+        <span>Open to work</span>
+      </div>
+      <button
+        class="nav-toggle"
+        onclick="document.getElementById('nav-links').classList.toggle('open')"
+        aria-label="Menu"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <div class="page">
+      <!-- HEADER -->
+      <div class="page-header">
+        <div class="section-label fade-up d1">04 / Contact</div>
+        <h1 class="page-title fade-up d2">
+          Let's build something <span class="gradient-text">great.</span>
+        </h1>
+        <p class="page-subtitle fade-up d3">
+          Open to full-time backend or full-stack roles, contract work, and
+          interesting side projects. TypeScript-first, remote worldwide.
+        </p>
+      </div>
+
+      <div style="max-width: 860px; margin: 0 auto; padding: 0 1.25rem 2.5rem">
+        <hr class="gradient-divider" />
+      </div>
+
+      <div class="contact-content">
+        <!-- AVAILABILITY -->
+        <div class="avail-card fade-up d2">
+          <div class="avail-dot"></div>
+          <div>
+            <div class="avail-title">Available for opportunities</div>
+            <div class="avail-desc">
+              Actively looking for backend or full-stack roles. Can start within
+              2–4 weeks. Located in Bogotá, open to remote worldwide.
+            </div>
+          </div>
+        </div>
+
+        <!-- SOCIAL LINKS -->
+        <div class="social-grid fade-up d3">
+          <a href="mailto:soymavc@gmail.com" class="social-card">
+            <div class="social-header">
+              <div class="social-name">Email</div>
+              <div class="social-arrow">↗</div>
+            </div>
+            <div class="social-value">soymavc@gmail.com</div>
+          </a>
+          <a
+            href="https://github.com/migueteado"
+            target="_blank"
+            class="social-card"
+          >
+            <div class="social-header">
+              <div class="social-name">GitHub</div>
+              <div class="social-arrow">↗</div>
+            </div>
+            <div class="social-value">github.com/migueteado</div>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/migueteado/"
+            target="_blank"
+            class="social-card"
+          >
+            <div class="social-header">
+              <div class="social-name">LinkedIn</div>
+              <div class="social-arrow">↗</div>
+            </div>
+            <div class="social-value">linkedin.com/in/migueteado</div>
+          </a>
+          <a
+            href="miguel-villalobos-resume.pdf"
+            download="Miguel_Villalobos_Resume.pdf"
+            class="social-card"
+          >
+            <div class="social-header">
+              <div class="social-name">Download Resume</div>
+              <div class="social-arrow">↓</div>
+            </div>
+            <div class="social-value">miguel-villalobos-resume.pdf</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span>© 2026 Miguel Villalobos</span>
+      <span>soymavc@gmail.com</span>
+      <span>Bogotá, Colombia 🇨🇴</span>
+    </footer>
+
+    <script>
+      document
+        .querySelectorAll(".nav-links a")
+        .forEach((a) =>
+          a.addEventListener("click", () =>
+            document.getElementById("nav-links").classList.remove("open"),
+          ),
+        );
+    </script>
+  </body>
+</html>

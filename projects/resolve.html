@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resolve · Miguel Villalobos</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="project-page.css">
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="../index.html" class="nav-logo">&gt;_</a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../projects.html" class="active">Projects</a></li>
+    <li><a href="../experience.html">Experience</a></li>
+    <li><a href="../contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span>Open to work</span>
+  </div>
+  <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page">
+
+  <a href="../projects.html" class="back-link fade-up d1">← Back to Projects</a>
+
+  <div class="project-header">
+    <div class="project-label fade-up d1">Customer Support System</div>
+    <h1 class="project-title fade-up d2">Resolve</h1>
+    <p class="project-tagline fade-up d3">
+      Customer support operations platform with automated resolutions, multi-provider refunds, and a full review workflow — tightly integrated with the order lifecycle.
+    </p>
+    <div class="project-meta fade-up d4">
+      <span class="meta-badge accent">Full Stack</span>
+      <span class="meta-badge">BÆRSkin Tactical · DivBrands</span>
+      <span class="meta-badge">Production</span>
+      <span class="meta-badge">Microservice</span>
+    </div>
+  </div>
+
+  <div style="max-width:860px;margin:0 auto;padding:0 1.25rem 2rem;">
+    <hr class="gradient-divider">
+  </div>
+
+  <div class="project-content">
+
+    <!-- OVERVIEW -->
+    <div class="section-card fade-up d2">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Overview</span>
+      </div>
+      <div class="section-card-body">
+        <p class="overview-text">
+          Resolve is a <strong>full-stack customer support operations platform</strong> that enables support teams to handle order modifications, cancellations, and refunds through a structured workflow. It integrates deeply with the existing order lifecycle, ensuring every operation is auditable, reversible, and reviewed before being committed.
+        </p>
+        <p class="overview-text" style="margin-top:1rem;">
+          The project demonstrates strong understanding of <strong>customer support flows</strong>, multi-provider payment integrations, and the importance of rollback safety in operations that touch live orders and financial records.
+        </p>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="section-card fade-up d3">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Features</span>
+      </div>
+      <div class="section-card-body">
+        <ul class="feature-list">
+          <li class="feature-item"><span class="feature-dot"></span>API for receiving operations requests from customer support departments</li>
+          <li class="feature-item"><span class="feature-dot"></span>Internal UI to generate tickets, track processes, and review pending operations</li>
+          <li class="feature-item"><span class="feature-dot"></span>Warehouse and stock management tied to item changes and cancellations</li>
+          <li class="feature-item"><span class="feature-dot"></span>Item change and order cancellation operations with inventory reconciliation</li>
+          <li class="feature-item"><span class="feature-dot"></span>Refund operations with Stripe, PayPal, Klarna, and Adyen integrations</li>
+          <li class="feature-item"><span class="feature-dot"></span>Logging system to keep a full audit trail of all CS department operations</li>
+          <li class="feature-item"><span class="feature-dot"></span>Review system requiring approval before committing changes to the system</li>
+          <li class="feature-item"><span class="feature-dot"></span>Rollback logic to safely undo operations in case of downstream failures</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div class="section-card fade-up d3">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Architecture</span>
+      </div>
+      <div class="section-card-body">
+        <div class="arch-grid">
+          <div class="arch-item full">
+            <div class="arch-item-label">System Context</div>
+            <div class="arch-item-desc">Part of a broader microservices ecosystem. Resolve coordinates with the order, fulfillment, and payment services to execute support operations safely — emitting events consumed by downstream services.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Frontend</div>
+            <div class="arch-item-desc">Internal UI for customer support teams to create tickets, review pending operations, and submit or reject changes before they're committed.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Backend API</div>
+            <div class="arch-item-desc">Handles requests from the frontend and other services. Manages the ticket lifecycle, review gates, and integration calls to payment providers.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Async Workers</div>
+            <div class="arch-item-desc">Inngest functions execute approved operations asynchronously — refunds, stock adjustments, cancellations — with retry logic and rollback handlers.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Database</div>
+            <div class="arch-item-desc">PostgreSQL stores tickets, operation logs, review states, and refund records with transactional guarantees for audit integrity.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="section-card fade-up d4">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Tech Stack</span>
+      </div>
+      <div class="section-card-body">
+        <div class="stack-group">
+          <div class="stack-row">
+            <div class="stack-row-label">Frontend</div>
+            <div class="stack-tags">
+              <span class="tag hot">Next.js</span>
+              <span class="tag hot">React</span>
+              <span class="tag">Tailwind CSS</span>
+              <span class="tag">shadcn/ui</span>
+            </div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-row-label">Backend</div>
+            <div class="stack-tags">
+              <span class="tag hot">TypeScript</span>
+              <span class="tag hot">Bun</span>
+              <span class="tag hot">Elysia.js</span>
+              <span class="tag hot">Inngest</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">Docker</span>
+              <span class="tag">GCP Compute Engine</span>
+            </div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-row-label">Payments</div>
+            <div class="stack-tags">
+              <span class="tag hot">Stripe</span>
+              <span class="tag hot">PayPal</span>
+              <span class="tag">Klarna</span>
+              <span class="tag">Adyen</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span>© 2026 Miguel Villalobos</span>
+  <span><a href="../projects.html" style="color:var(--muted);text-decoration:none;">← All Projects</a></span>
+  <span>Bogotá, Colombia 🇨🇴</span>
+</footer>
+
+<script>
+document.querySelectorAll('.nav-links a').forEach(a =>
+  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope · Miguel Villalobos</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="project-page.css">
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="../index.html" class="nav-logo">&gt;_</a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../projects.html" class="active">Projects</a></li>
+    <li><a href="../experience.html">Experience</a></li>
+    <li><a href="../contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span>Open to work</span>
+  </div>
+  <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page">
+
+  <a href="../projects.html" class="back-link fade-up d1">← Back to Projects</a>
+
+  <div class="project-header">
+    <div class="project-label fade-up d1">Ad Channel Monitoring</div>
+    <h1 class="project-title fade-up d2">Scope</h1>
+    <p class="project-tagline fade-up d3">
+      Ad channel monitoring and audience targeting rules engine — integrating with YouTube and Google Ads APIs to keep brand advertising within defined audience boundaries.
+    </p>
+    <div class="project-meta fade-up d4">
+      <span class="meta-badge accent">Full Stack</span>
+      <span class="meta-badge">BÆRSkin Tactical · DivBrands</span>
+      <span class="meta-badge">Production</span>
+      <span class="meta-badge">Microservice</span>
+    </div>
+  </div>
+
+  <div style="max-width:860px;margin:0 auto;padding:0 1.25rem 2rem;">
+    <hr class="gradient-divider">
+  </div>
+
+  <div class="project-content">
+
+    <!-- OVERVIEW -->
+    <div class="section-card fade-up d2">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Overview</span>
+      </div>
+      <div class="section-card-body">
+        <p class="overview-text">
+          Scope is a <strong>full-stack marketing monitoring application</strong> that integrates with the YouTube API and Google Ads API to track the channels where ads are being shown. Based on configurable audience targeting rules, it automatically identifies channels that fall outside the defined target audience and excludes them from future ad placements.
+        </p>
+        <p class="overview-text" style="margin-top:1rem;">
+          The project demonstrates practical knowledge of <strong>ad platform APIs</strong>, data collection pipelines, and building internal tools that give marketing teams operational control over campaign placement at scale.
+        </p>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="section-card fade-up d3">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Features</span>
+      </div>
+      <div class="section-card-body">
+        <ul class="feature-list">
+          <li class="feature-item"><span class="feature-dot"></span>API for receiving operations requests from marketing departments</li>
+          <li class="feature-item"><span class="feature-dot"></span>Internal UI to review channel data and submit targeting rule changes</li>
+          <li class="feature-item"><span class="feature-dot"></span>Background workers that continuously collect data from the Google Ads and YouTube APIs</li>
+          <li class="feature-item"><span class="feature-dot"></span>Automated channel exclusion operations via the Google Ads API based on audience rules</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div class="section-card fade-up d3">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Architecture</span>
+      </div>
+      <div class="section-card-body">
+        <div class="arch-grid">
+          <div class="arch-item full">
+            <div class="arch-item-label">System Context</div>
+            <div class="arch-item-desc">Part of a broader microservices ecosystem. Scope operates as an independent monitoring service — ingesting data from ad platforms and applying targeting rules without depending on other internal services.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Frontend</div>
+            <div class="arch-item-desc">Internal UI for the marketing team to review channel placement data, inspect flagged channels, and submit or configure audience targeting rules.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Backend API</div>
+            <div class="arch-item-desc">Handles frontend requests and exposes endpoints for rule configuration, channel review, and triggering manual operations against the Google Ads API.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Async Workers</div>
+            <div class="arch-item-desc">Custom background workers collect channel and campaign data from YouTube and Google Ads on a schedule, then evaluate placement against targeting rules.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Database</div>
+            <div class="arch-item-desc">PostgreSQL stores channel records, targeting rules, placement history, and exclusion logs for reporting and auditing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="section-card fade-up d4">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Tech Stack</span>
+      </div>
+      <div class="section-card-body">
+        <div class="stack-group">
+          <div class="stack-row">
+            <div class="stack-row-label">Frontend</div>
+            <div class="stack-tags">
+              <span class="tag hot">Next.js</span>
+              <span class="tag hot">React</span>
+              <span class="tag">Tailwind CSS</span>
+              <span class="tag">shadcn/ui</span>
+            </div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-row-label">Backend</div>
+            <div class="stack-tags">
+              <span class="tag hot">TypeScript</span>
+              <span class="tag hot">Node.js</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">Docker</span>
+              <span class="tag">GCP Compute Engine</span>
+            </div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-row-label">APIs</div>
+            <div class="stack-tags">
+              <span class="tag hot">Google Ads API</span>
+              <span class="tag hot">YouTube API</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span>© 2026 Miguel Villalobos</span>
+  <span><a href="../projects.html" style="color:var(--muted);text-decoration:none;">← All Projects</a></span>
+  <span>Bogotá, Colombia 🇨🇴</span>
+</footer>
+
+<script>
+document.querySelectorAll('.nav-links a').forEach(a =>
+  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
+);
+</script>
+</body>
+</html>

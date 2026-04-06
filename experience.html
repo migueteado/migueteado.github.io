@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experience · Miguel Villalobos</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 4rem 1.25rem 3rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) { .page-header { padding: 5rem 2rem 3.5rem; } }
+@media (min-width: 900px) { .page-header { padding: 5rem 2.5rem 3.5rem; } }
+
+.page-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.2rem, 7vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+.page-subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 520px;
+}
+
+/* ── EXPERIENCE CONTENT ── */
+.exp-content {
+  padding: 0 1.25rem;
+  max-width: 860px;
+  margin: 0 auto 2rem;
+}
+@media (min-width: 640px) { .exp-content { padding: 0 2rem; } }
+@media (min-width: 900px) { .exp-content { padding: 0 2.5rem; } }
+
+/* ── JOB CARD ── */
+.job-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.2s;
+}
+.job-card:hover { border-color: rgba(167,139,250,0.3); }
+
+.job-header {
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  .job-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+}
+
+.job-company {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.job-role {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+.job-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.job-period {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  white-space: nowrap;
+  text-align: right;
+}
+.job-location {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* Impact metrics */
+.job-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.metric {
+  background: var(--surface);
+  padding: 1rem 1.25rem;
+  text-align: center;
+}
+.metric-val {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.3rem, 3.5vw, 1.75rem);
+  color: var(--accent);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.metric-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  margin-top: 0.2rem;
+  line-height: 1.4;
+}
+
+/* Phases / sections */
+.job-body {
+  padding: 1.5rem;
+}
+
+.phase {
+  margin-bottom: 2rem;
+}
+.phase:last-of-type { margin-bottom: 0; }
+
+.phase-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+@media (min-width: 480px) {
+  .phase-header { flex-direction: row; align-items: baseline; gap: 0.75rem; }
+}
+.phase-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.phase-period {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.bullet-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.bullet-item {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  font-size: 0.93rem;
+  color: var(--muted);
+  line-height: 1.7;
+  padding: 0.75rem 1rem;
+  background: var(--surface2);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+.bullet-item:hover {
+  border-color: var(--border);
+  color: var(--text);
+}
+.bullet-arrow {
+  color: var(--accent3);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+}
+
+/* Stack tags inside job */
+.job-stack {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+.stack-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 0.25rem;
+  flex-shrink: 0;
+}
+
+/* ── EDUCATION ── */
+.edu-section {
+  padding: 0 1.25rem 1rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) { .edu-section { padding: 0 2rem 1rem; } }
+@media (min-width: 900px) { .edu-section { padding: 0 2.5rem 1rem; } }
+
+.edu-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.2s;
+}
+.edu-card:hover { border-color: rgba(167,139,250,0.3); }
+
+.edu-degree {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+}
+.edu-school {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.edu-year {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--accent3);
+  margin-top: 0.1rem;
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">&gt;_</a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="experience.html" class="active">Experience</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span>Open to work</span>
+  </div>
+  <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="section-label fade-up d1">03 / Experience</div>
+    <h1 class="page-title fade-up d2">Where I've <span class="gradient-text">Worked</span></h1>
+    <p class="page-subtitle fade-up d3">
+      7+ years building production backend systems. Progressed from web developer to primary engineer owning 5 services at scale across e-commerce infrastructure.
+    </p>
+  </div>
+
+  <div style="max-width:860px;margin:0 auto;padding:0 1.25rem 2.5rem;">
+    <hr class="gradient-divider">
+  </div>
+
+  <!-- EXPERIENCE CARDS -->
+  <div class="exp-content">
+
+    <!-- BAERSKIN -->
+    <div class="job-card fade-up d2">
+      <div class="job-header">
+        <div>
+          <div class="job-company">BÆRSkin Tactical Supply Co.</div>
+          <div class="job-role">Web Developer → Full Stack Engineer → Senior Full Stack Engineer · DivBrands</div>
+        </div>
+        <div class="job-meta">
+          <div class="job-period">Sep 2018 — Present</div>
+          <div class="job-location">Bogotá, CO · Remote</div>
+        </div>
+      </div>
+
+      <div class="job-metrics">
+        <div class="metric">
+          <div class="metric-val">100%</div>
+          <div class="metric-label">Incidents resolved (52/52)</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">200K+</div>
+          <div class="metric-label">Orders/month at scale</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">5.3×</div>
+          <div class="metric-label">Batch throughput gain</div>
+        </div>
+      </div>
+
+      <div class="job-body">
+
+        <div class="phase">
+          <div class="phase-header">
+            <div class="phase-title">Reliability &amp; Ownership</div>
+            <div class="phase-period">Oct 2023 — Present</div>
+          </div>
+          <ul class="bullet-list">
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Resolved 100% of urgent production incidents (52/52) with a median resolution time of 1 day, protecting revenue across order processing, payments, and fulfillment.
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Maintained system reliability as order volume grew from ~1,700 to 200,000+ orders/month over a 3-year period.
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Served as on-call engineer and first responder: triaging issues, coordinating resolution across teams, and implementing monitoring and alerting across backend services.
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Coordinated across a distributed team spanning Brazil, Scotland, Serbia, and the Netherlands — aligning on migration strategy and shared architectural patterns across 4+ timezones.
+            </li>
+          </ul>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <div class="phase-title">Key Projects &amp; Contributions</div>
+            <div class="phase-period">2018 — Present</div>
+          </div>
+          <ul class="bullet-list">
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Led live migration of the fulfillment tracking platform (V1 → V3) during active peak growth — new database architecture, auth layer, and modular service decomposition. Improved batch throughput 5.3× (10,000 orders: 8 hrs → 1.5 hrs).
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Built order-to-parcel matching system from scratch that scaled to 200,000+ parcels/month, automating a previously manual fulfillment workflow.
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Designed and built a greenfield lead management system end-to-end — backend APIs through React frontend — including auth, search, campaign management, conversion tracking, and order creation.
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Built automation pipelines for inventory calculations, reporting exports, and operations workflows, reducing manual work across fulfillment coordination.
+            </li>
+          </ul>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <div class="phase-title">Foundation</div>
+            <div class="phase-period">Sep 2018 — Sep 2023</div>
+          </div>
+          <ul class="bullet-list">
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Built and maintained backend services for order lifecycle, shipping, tracking, and payment flows — establishing patterns later scaled across the platform.
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Implemented integrations with Stripe, PayPal, Shopify, WooCommerce, Google Ads, and Facebook Ads, creating the multi-channel integration layer.
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-arrow">→</span>
+              Introduced Sentry for error tracking, establishing the foundation for production observability. Built internal tools and dashboards for operations teams.
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="job-stack">
+        <span class="stack-label">Stack</span>
+        <span class="tag hot">TypeScript</span>
+        <span class="tag hot">Node.js</span>
+        <span class="tag hot">PostgreSQL</span>
+        <span class="tag hot">React</span>
+        <span class="tag">Next.js</span>
+        <span class="tag">Bun</span>
+        <span class="tag">Elysia.js</span>
+        <span class="tag">Drizzle ORM</span>
+        <span class="tag">Inngest</span>
+        <span class="tag">Stripe</span>
+        <span class="tag">Shopify APIs</span>
+        <span class="tag">Sentry</span>
+      </div>
+    </div>
+
+    <!-- CPS LATAM -->
+    <div class="job-card fade-up d3">
+      <div class="job-header">
+        <div>
+          <div class="job-company">CPS Latam</div>
+          <div class="job-role">Software Engineer</div>
+        </div>
+        <div class="job-meta">
+          <div class="job-period">2017 — 2019</div>
+          <div class="job-location">Venezuela</div>
+        </div>
+      </div>
+
+      <div class="job-body">
+        <ul class="bullet-list">
+          <li class="bullet-item">
+            <span class="bullet-arrow">→</span>
+            Built and maintained administrative and academic software for higher education institutions using Java and web technologies.
+          </li>
+          <li class="bullet-item">
+            <span class="bullet-arrow">→</span>
+            Developed features across the full stack for institutional management systems, supporting academic operations and administrative workflows.
+          </li>
+        </ul>
+      </div>
+
+      <div class="job-stack">
+        <span class="stack-label">Stack</span>
+        <span class="tag hot">Java</span>
+        <span class="tag">Web Technologies</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="edu-section fade-up d4">
+    <div style="max-width:860px;margin:0 auto 2rem;padding:0;">
+      <hr class="gradient-divider">
+    </div>
+    <div class="section-label" style="margin-bottom:1.25rem;">Education</div>
+    <div class="edu-card">
+      <div class="edu-degree">B.Sc. Computer Engineering</div>
+      <div class="edu-school">Universidad Dr Rafael Belloso Chacín</div>
+      <div class="edu-year">2013 — 2017</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>© 2026 Miguel Villalobos</span>
+  <span><a href="https://linkedin.com/in/migueteado" style="color:var(--muted);text-decoration:none;">linkedin.com/in/migueteado</a></span>
+  <span>Bogotá, Colombia 🇨🇴</span>
+</footer>
+
+<script>
+document.querySelectorAll('.nav-links a').forEach(a =>
+  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
+);
+</script>
+</body>
+</html>

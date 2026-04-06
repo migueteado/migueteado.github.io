@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Miguel Villalobos · Senior Backend Engineer</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* ── HERO ──────────────────────────────── */
+      .hero {
+        padding: 4rem 1.25rem 3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 3.5rem;
+      }
+      @media (min-width: 900px) {
+        .hero {
+          display: grid;
+          grid-template-columns: 1fr 420px;
+          align-items: center;
+          gap: 4rem;
+          padding: 5rem 2.5rem 4rem;
+          max-width: 1100px;
+          margin: 0 auto;
+          min-height: calc(100vh - 64px);
+        }
+      }
+
+      .hero-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+      }
+      .hero-label::before {
+        content: "";
+        display: block;
+        width: 18px;
+        height: 1px;
+        background: var(--accent);
+      }
+
+      .hero-name {
+        font-family: "Inter", sans-serif;
+        font-weight: 800;
+        font-size: clamp(2.6rem, 10vw, 4.5rem);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+      }
+
+      .hero-desc {
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.8;
+        max-width: 520px;
+        margin-top: 1.25rem;
+      }
+      .hero-desc strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      /* Skills pills row */
+      .hero-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.75rem;
+      }
+
+      /* Stats row */
+      .hero-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1.75rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+      }
+      @media (min-width: 480px) {
+        .hero-stats {
+          flex-direction: row;
+          align-items: center;
+          gap: 0;
+        }
+      }
+
+      .hero-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.88rem;
+        color: var(--muted);
+        padding-right: 1.25rem;
+      }
+      @media (min-width: 480px) {
+        .hero-stat {
+          border-right: 1px solid var(--border);
+          padding-right: 1.25rem;
+        }
+        .hero-stat:first-child {
+          padding-left: 0;
+        }
+        .hero-stat:last-child {
+          border-right: none;
+          padding-right: 0;
+          padding-left: 1.25rem;
+        }
+        .hero-stat:not(:first-child):not(:last-child) {
+          padding-left: 1.25rem;
+        }
+      }
+      .hero-stat strong {
+        font-weight: 700;
+        color: var(--accent);
+        font-family: "Inter", sans-serif;
+      }
+
+      .hero-ctas {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+      }
+
+      /* ── TERMINAL ──────────────────────────── */
+      .terminal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        position: relative;
+      }
+      .terminal::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, var(--glow) 0%, transparent 60%);
+        pointer-events: none;
+        border-radius: inherit;
+      }
+
+      .terminal-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface2);
+      }
+      .t-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .t-dot:nth-child(1) {
+        background: #ff5f57;
+      }
+      .t-dot:nth-child(2) {
+        background: #febc2e;
+      }
+      .t-dot:nth-child(3) {
+        background: #28c840;
+      }
+      .t-title {
+        flex: 1;
+        text-align: center;
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+      }
+
+      .terminal-body {
+        padding: 1.25rem 1.25rem;
+        font-family: "DM Mono", monospace;
+        font-size: 0.8rem;
+        line-height: 1.9;
+      }
+      .tl {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .tp {
+        color: var(--accent);
+        user-select: none;
+      }
+      .tc {
+        color: var(--text);
+      }
+      .to {
+        color: var(--muted);
+        padding-left: 0.75rem;
+      }
+      .tk {
+        color: #93c5fd;
+      }
+      .tv {
+        color: #fcd34d;
+      }
+      .ts {
+        color: var(--accent);
+      }
+      .cursor {
+        display: inline-block;
+        width: 7px;
+        height: 12px;
+        background: var(--accent);
+        animation: blink 1.1s step-end infinite;
+        vertical-align: middle;
+        margin-left: 2px;
+        border-radius: 1px;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* ── QUICK NAV ─────────────────────────── */
+      .quick-nav-section {
+        padding: 4rem 1.25rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      @media (min-width: 640px) {
+        .quick-nav-section {
+          padding: 5rem 2rem;
+        }
+      }
+      @media (min-width: 900px) {
+        .quick-nav-section {
+          padding: 5rem 2.5rem;
+        }
+      }
+
+      .quick-nav-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+      @media (min-width: 640px) {
+        .quick-nav-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .qn-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        transition:
+          border-color 0.2s,
+          background 0.2s,
+          transform 0.2s;
+      }
+      .qn-card:hover {
+        border-color: rgba(167, 139, 250, 0.35);
+        background: var(--surface2);
+        transform: translateY(-2px);
+      }
+      .qn-card:hover .qn-arrow {
+        color: var(--accent);
+        transform: translate(3px, -3px);
+      }
+
+      .qn-num {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+      }
+      .qn-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      .qn-desc {
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.65;
+        flex: 1;
+      }
+      .qn-arrow {
+        color: var(--muted);
+        font-size: 1.1rem;
+        transition: all 0.2s;
+        align-self: flex-end;
+        margin-top: 0.5rem;
+      }
+
+      /* ── DIVIDER SECTION ───────────────────── */
+      .divider-section {
+        padding: 0 1.25rem;
+      }
+      @media (min-width: 640px) {
+        .divider-section {
+          padding: 0 2rem;
+        }
+      }
+      @media (min-width: 900px) {
+        .divider-section {
+          padding: 0 2.5rem;
+          max-width: 1100px;
+          margin: 0 auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-bg"></div>
+
+    <nav>
+      <a href="index.html" class="nav-logo">&gt;_</a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="experience.html">Experience</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-status">
+        <div class="status-dot"></div>
+        <span>Open to work</span>
+      </div>
+      <button
+        class="nav-toggle"
+        onclick="document.getElementById('nav-links').classList.toggle('open')"
+        aria-label="Menu"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <div class="page">
+      <!-- HERO -->
+      <div class="hero">
+        <div>
+          <div class="hero-label fade-up d1">
+            Senior Full-Stack / Backend Engineer
+          </div>
+          <h1 class="hero-name fade-up d2">
+            Miguel<br /><span class="gradient-text">Villalobos</span>
+          </h1>
+          <p class="hero-desc fade-up d3">
+            Specialized in <strong>e-commerce backend</strong> and operations
+            infrastructure — order lifecycle, fulfillment, payments, and
+            inventory systems. 9+ years building production systems at scale.
+          </p>
+
+          <div class="hero-skills fade-up d4">
+            <span class="tag hot">TypeScript</span>
+            <span class="tag hot">Node.js</span>
+            <span class="tag hot">PostgreSQL</span>
+            <span class="tag">Next.js</span>
+            <span class="tag">React</span>
+            <span class="tag">Drizzle ORM</span>
+            <span class="tag">Stripe</span>
+            <span class="tag">Shopify APIs</span>
+          </div>
+
+          <div class="hero-stats fade-up d5">
+            <div class="hero-stat"><strong>7+</strong> Years experience</div>
+            <div class="hero-stat"><strong>200K+</strong> Orders/month</div>
+            <div class="hero-stat">
+              <strong>100%</strong> Incidents resolved
+            </div>
+          </div>
+
+          <div class="hero-ctas fade-up d6">
+            <a href="contact.html#resume" class="btn-primary"
+              >Download Resume ↓</a
+            >
+            <a href="contact.html" class="btn-ghost">Get in touch</a>
+          </div>
+        </div>
+
+        <div class="fade-up d6">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="t-dot"></div>
+              <div class="t-dot"></div>
+              <div class="t-dot"></div>
+              <div class="t-title">~/migueteado — zsh</div>
+            </div>
+            <div class="terminal-body">
+              <div class="tl">
+                <span class="tp">❯</span
+                ><span class="tc"> cat profile.json</span>
+              </div>
+              <div class="to">{</div>
+              <div class="to">
+                &nbsp;&nbsp;<span class="tk">"name"</span>:
+                <span class="ts">"Miguel Villalobos"</span>,
+              </div>
+              <div class="to">
+                &nbsp;&nbsp;<span class="tk">"role"</span>:
+                <span class="ts">"Senior Full-Stack / Backend"</span>,
+              </div>
+              <div class="to">
+                &nbsp;&nbsp;<span class="tk">"stack"</span>: [
+              </div>
+              <div class="to">
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="ts">"TypeScript"</span>,
+                <span class="ts">"Node.js"</span>,
+                <span class="ts">"PostgreSQL"</span>
+              </div>
+              <div class="to">&nbsp;&nbsp;],</div>
+              <div class="to">
+                &nbsp;&nbsp;<span class="tk">"open_to_work"</span>:
+                <span class="tv">true</span>,
+              </div>
+              <div class="to">
+                &nbsp;&nbsp;<span class="tk">"location"</span>:
+                <span class="ts">"Bogotá, CO 🇨🇴"</span>,
+              </div>
+              <div class="to">
+                &nbsp;&nbsp;<span class="tk">"remote"</span>:
+                <span class="tv">true</span>
+              </div>
+              <div class="to">}</div>
+              <div class="tl" style="margin-top: 0.4rem">
+                <span class="tp">❯</span>&nbsp;<span class="cursor"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRADIENT DIVIDER -->
+      <div style="padding: 0 1.25rem; max-width: 1100px; margin: 0 auto">
+        <hr class="gradient-divider" />
+      </div>
+
+      <!-- QUICK NAV CARDS -->
+      <div class="quick-nav-section">
+        <div class="section-label fade-up d1">Explore</div>
+        <div class="quick-nav-grid">
+          <a href="projects.html" class="qn-card fade-up d2">
+            <div class="qn-num">02</div>
+            <div class="qn-title">Projects</div>
+            <div class="qn-desc">
+              Distributed systems, APIs, and infrastructure tooling built at
+              scale.
+            </div>
+            <div class="qn-arrow">↗</div>
+          </a>
+          <a href="experience.html" class="qn-card fade-up d3">
+            <div class="qn-num">03</div>
+            <div class="qn-title">Experience</div>
+            <div class="qn-desc">
+              7+ years at BÆRSkin Tactical — from web dev to owning 5 production
+              services.
+            </div>
+            <div class="qn-arrow">↗</div>
+          </a>
+          <a href="contact.html" class="qn-card fade-up d4">
+            <div class="qn-num">04</div>
+            <div class="qn-title">Contact</div>
+            <div class="qn-desc">
+              Open to full-time backend roles. Remote worldwide. Resume
+              available.
+            </div>
+            <div class="qn-arrow">↗</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span>© 2026 Miguel Villalobos</span>
+      <span>Built with HTML · CSS · ☕</span>
+      <span>Bogotá, Colombia 🇨🇴</span>
+    </footer>
+
+    <script>
+      document
+        .querySelectorAll(".nav-links a")
+        .forEach((a) =>
+          a.addEventListener("click", () =>
+            document.getElementById("nav-links").classList.remove("open"),
+          ),
+        );
+    </script>
+  </body>
+</html>

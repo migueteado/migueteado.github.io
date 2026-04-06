@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus · Miguel Villalobos</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="project-page.css">
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="../index.html" class="nav-logo">&gt;_</a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../projects.html" class="active">Projects</a></li>
+    <li><a href="../experience.html">Experience</a></li>
+    <li><a href="../contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span>Open to work</span>
+  </div>
+  <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page">
+
+  <a href="../projects.html" class="back-link fade-up d1">← Back to Projects</a>
+
+  <div class="project-header">
+    <div class="project-label fade-up d1">Payment Orchestration</div>
+    <h1 class="project-title fade-up d2">Nexus</h1>
+    <p class="project-tagline fade-up d3">
+      Payment orchestration layer across multiple providers — normalizing payment data, handling refunds and disputes, and exposing a unified API to the rest of the platform.
+    </p>
+    <div class="project-meta fade-up d4">
+      <span class="meta-badge accent">Backend</span>
+      <span class="meta-badge">BÆRSkin Tactical · DivBrands</span>
+      <span class="meta-badge">Production</span>
+      <span class="meta-badge">Microservice</span>
+    </div>
+  </div>
+
+  <div style="max-width:860px;margin:0 auto;padding:0 1.25rem 2rem;">
+    <hr class="gradient-divider">
+  </div>
+
+  <div class="project-content">
+
+    <!-- OVERVIEW -->
+    <div class="section-card fade-up d2">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Overview</span>
+      </div>
+      <div class="section-card-body">
+        <p class="overview-text">
+          Nexus is a <strong>backend payment processing orchestrator</strong> that abstracts over multiple payment providers — Stripe, PayPal, Klarna, Primer, and Adyen. It normalizes payment data into a unified model, handles refunds and dispute operations, and exposes a single consistent API that the rest of the platform uses regardless of which provider processed a given transaction.
+        </p>
+        <p class="overview-text" style="margin-top:1rem;">
+          The project demonstrates deep expertise in <strong>payment provider integration</strong>, retry logic for financial operations, and the design of reliable orchestration layers in a multi-provider environment.
+        </p>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="section-card fade-up d3">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Features</span>
+      </div>
+      <div class="section-card-body">
+        <ul class="feature-list">
+          <li class="feature-item"><span class="feature-dot"></span>Unified API for receiving payment operation requests from other internal services</li>
+          <li class="feature-item"><span class="feature-dot"></span>Normalized payment data model across Stripe, PayPal, Klarna, Primer, and Adyen</li>
+          <li class="feature-item"><span class="feature-dot"></span>Asynchronous workers to handle requested operations with retry logic and fallbacks for reliability</li>
+          <li class="feature-item"><span class="feature-dot"></span>Refund and dispute operation handling delegated to the correct provider per transaction</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div class="section-card fade-up d3">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Architecture</span>
+      </div>
+      <div class="section-card-body">
+        <div class="arch-grid">
+          <div class="arch-item full">
+            <div class="arch-item-label">System Context</div>
+            <div class="arch-item-desc">Part of a broader microservices ecosystem. Nexus acts as the payment abstraction layer — consumed by services like Resolve and Shield to execute financial operations without needing to know which provider handled the original transaction.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Backend API</div>
+            <div class="arch-item-desc">Exposes a provider-agnostic API for payment queries and operations. Routes requests to the correct provider integration based on transaction metadata.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Async Workers</div>
+            <div class="arch-item-desc">Inngest functions execute payment operations asynchronously with retry logic, exponential backoff, and fallback handling to ensure reliability under provider-side failures.</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-item-label">Database</div>
+            <div class="arch-item-desc">PostgreSQL stores normalized payment records, operation logs, and provider mappings — serving as the source of truth for all payment state across the platform.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="section-card fade-up d4">
+      <div class="section-card-header">
+        <span class="section-card-icon">◈</span>
+        <span class="section-card-title">Tech Stack</span>
+      </div>
+      <div class="section-card-body">
+        <div class="stack-group">
+          <div class="stack-row">
+            <div class="stack-row-label">Backend</div>
+            <div class="stack-tags">
+              <span class="tag hot">TypeScript</span>
+              <span class="tag hot">Bun</span>
+              <span class="tag hot">Elysia.js</span>
+              <span class="tag hot">Inngest</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">Docker</span>
+              <span class="tag">GCP Compute Engine</span>
+            </div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-row-label">Payments</div>
+            <div class="stack-tags">
+              <span class="tag hot">Stripe</span>
+              <span class="tag hot">PayPal</span>
+              <span class="tag">Klarna</span>
+              <span class="tag">Adyen</span>
+              <span class="tag">Primer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span>© 2026 Miguel Villalobos</span>
+  <span><a href="../projects.html" style="color:var(--muted);text-decoration:none;">← All Projects</a></span>
+  <span>Bogotá, Colombia 🇨🇴</span>
+</footer>
+
+<script>
+document.querySelectorAll('.nav-links a').forEach(a =>
+  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
+);
+</script>
+</body>
+</html>
