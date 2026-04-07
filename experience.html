@@ -296,15 +296,27 @@
           <div class="status-dot"></div>
           <span class="nav-status-text">Open to work</span>
         </div>
-        <a href="https://github.com/migueteado" target="_blank" class="nav-icon" aria-label="GitHub">
+        <a
+          href="https://github.com/migueteado"
+          target="_blank"
+          class="nav-icon"
+          aria-label="GitHub"
+        >
           <i class="fa-brands fa-github"></i>
         </a>
-        <a href="https://www.linkedin.com/in/migueteado/" target="_blank" class="nav-icon" aria-label="LinkedIn">
+        <a
+          href="https://www.linkedin.com/in/migueteado/"
+          target="_blank"
+          class="nav-icon"
+          aria-label="LinkedIn"
+        >
           <i class="fa-brands fa-linkedin-in"></i>
         </a>
         <button
           class="nav-toggle"
-          onclick="document.getElementById('nav-links').classList.toggle('open')"
+          onclick="
+            document.getElementById('nav-links').classList.toggle('open')
+          "
           aria-label="Menu"
         >
           <span></span><span></span><span></span>
@@ -441,11 +453,11 @@
             <div class="exp-stack">
               <span class="stack-label">Stack</span>
               <span class="tag hot">TypeScript</span>
+              <span class="tag hot">Next.js</span>
+              <span class="tag hot">Bun</span>
               <span class="tag hot">Node.js</span>
               <span class="tag hot">PostgreSQL</span>
-              <span class="tag hot">React</span>
-              <span class="tag">Next.js</span>
-              <span class="tag">Bun</span>
+              <span class="tag">React</span>
               <span class="tag">Elysia.js</span>
               <span class="tag">Drizzle ORM</span>
               <span class="tag">Inngest</span>
@@ -527,10 +539,14 @@
       </div>
     </div>
 
-        <footer>
-      <span>© 2026 Miguel Villalobos</span>
-      <span>Built with HTML · CSS · JS · ❤️</span>
-      <span>Bogotá, Colombia 🇨🇴</span>
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-col">© 2026 Miguel Villalobos</div>
+        <div class="footer-col footer-col--center">
+          Built with HTML · CSS · JS · ❤️
+        </div>
+        <div class="footer-col footer-col--right">Bogotá, Colombia 🇨🇴</div>
+      </div>
     </footer>
 
     <script>
