@@ -2,18 +2,18 @@
 
 /* ─── TOKENS ──────────────────────────────────────── */
 :root {
-  --bg: #282a36;
-  --surface: #21222c;
-  --surface2: #191a23;
-  --border: #44475a;
-  --text: #f8f8f2;
-  --muted: #6272a4;
-  --accent: #bd93f9;
-  --accent2: #ff79c6;
-  --accent3: #50fa7b;
-  --glow: rgba(189, 147, 249, 0.08);
-  --radius: 12px;
-  --gradient: linear-gradient(135deg, #bd93f9 0%, #ff79c6 100%);
+  --bg: #f8f7f4;
+  --surface: #ffffff;
+  --surface2: #f0ede8;
+  --border: #e0dbd3;
+  --text: #1c1c1a;
+  --muted: #7a7670;
+  --accent: #2d6a50;
+  --accent2: #3d6b96;
+  --accent3: #3d7a5f;
+  --glow: rgba(45, 106, 80, 0.07);
+  --radius: 10px;
+  --gradient: linear-gradient(135deg, #2d6a50 0%, #3d6b96 100%);
 }
 
 *,
@@ -41,9 +41,9 @@ body {
 .grid-bg {
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-image: radial-gradient(var(--border) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
-  opacity: 0.6;
+  opacity: 0.8;
   pointer-events: none;
   z-index: 0;
 }
@@ -54,7 +54,7 @@ body {
   inset: 0;
   background: radial-gradient(
     ellipse at center,
-    transparent 40%,
+    transparent 30%,
     var(--bg) 100%
   );
 }
@@ -71,7 +71,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 0 1.25rem;
-  background: rgba(40, 42, 54, 0.85);
+  background: rgba(248, 247, 244, 0.92);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
 }
@@ -84,6 +84,33 @@ nav div {
 
 nav div .nav-status {
   padding-left: 2rem;
+}
+
+/* New right group (index.html) */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+.nav-right .nav-status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+  padding-right: 0.4rem;
+  border-right: 1px solid var(--border);
+}
+.nav-status-text {
+  display: none;
+}
+@media (min-width: 640px) {
+  .nav-status-text {
+    display: inline;
+  }
 }
 
 .nav-logo {
@@ -103,7 +130,7 @@ nav div .nav-status {
   top: 60px;
   left: 0;
   right: 0;
-  background: rgba(12, 12, 15, 0.98);
+  background: rgba(248, 247, 244, 0.98);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   flex-direction: column;
@@ -186,6 +213,13 @@ nav div .nav-status {
   nav {
     height: 64px;
     padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+
+  .nav-right {
+    justify-self: end;
   }
 
   .nav-links {
@@ -330,7 +364,7 @@ nav div .nav-status {
   gap: 0.5rem;
   padding: 0.65rem 1.5rem;
   background: var(--accent);
-  color: #0c0c0f;
+  color: #ffffff;
   font-family: "Inter", sans-serif;
   font-size: 0.88rem;
   font-weight: 600;
@@ -342,9 +376,9 @@ nav div .nav-status {
   white-space: nowrap;
 }
 .btn-primary:hover {
-  background: #c4b0fd;
+  background: #235840;
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(189, 147, 249, 0.3);
+  box-shadow: 0 6px 24px rgba(45, 106, 80, 0.2);
 }
 
 .btn-ghost {
@@ -390,7 +424,7 @@ nav div .nav-status {
 }
 .tag:hover,
 .tag.hot {
-  border-color: rgba(189, 147, 249, 0.4);
+  border-color: rgba(45, 106, 80, 0.4);
   color: var(--accent);
   background: var(--glow);
 }
@@ -405,7 +439,7 @@ nav div .nav-status {
     background 0.2s;
 }
 .card:hover {
-  border-color: rgba(189, 147, 249, 0.3);
+  border-color: rgba(45, 106, 80, 0.3);
 }
 
 /* ─── FOOTER ──────────────────────────────────────── */

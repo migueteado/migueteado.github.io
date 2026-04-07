@@ -24,45 +24,34 @@
     <div class="grid-bg"></div>
 
     <nav>
-      <a href="../index.html" class="nav-logo">&gt;_</a>
-      <div>
-        <ul class="nav-links" id="nav-links">
-          <li><a href="../index.html">Home</a></li>
-          <li><a href="../projects.html" class="active">Projects</a></li>
-          <li><a href="../experience.html">Experience</a></li>
-          <li><a href="../contact.html">Contact</a></li>
-          <li>
-            <a
-              href="https://github.com/migueteado"
-              target="_blank"
-              class="nav-icon"
-              aria-label="GitHub"
-              ><i class="fa-brands fa-github"></i
-            ></a>
-          </li>
-          <li>
-            <a
-              href="https://www.linkedin.com/in/migueteado/"
-              target="_blank"
-              class="nav-icon"
-              aria-label="LinkedIn"
-              ><i class="fa-brands fa-linkedin-in"></i
-            ></a>
-          </li>
-        </ul>
+      <a href="../index.html" class="nav-logo">MV</a>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../experience.html">Experience</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul>
+
+      <div class="nav-right">
         <div class="nav-status">
           <div class="status-dot"></div>
-          <span>Open to work</span>
+          <span class="nav-status-text">Open to work</span>
         </div>
+        <a href="https://github.com/migueteado" target="_blank" class="nav-icon" aria-label="GitHub">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/migueteado/" target="_blank" class="nav-icon" aria-label="LinkedIn">
+          <i class="fa-brands fa-linkedin-in"></i>
+        </a>
+        <button
+          class="nav-toggle"
+          onclick="document.getElementById('nav-links').classList.toggle('open')"
+          aria-label="Menu"
+        >
+          <span></span><span></span><span></span>
+        </button>
       </div>
-
-      <button
-        class="nav-toggle"
-        onclick="document.getElementById('nav-links').classList.toggle('open')"
-        aria-label="Menu"
-      >
-        <span></span><span></span><span></span>
-      </button>
     </nav>
 
     <div class="page">
@@ -206,15 +195,9 @@
       </div>
     </div>
 
-    <footer>
+        <footer>
       <span>© 2026 Miguel Villalobos</span>
-      <span
-        ><a
-          href="../projects.html"
-          style="color: var(--muted); text-decoration: none"
-          >← All Projects</a
-        ></span
-      >
+      <span>Built with HTML · CSS · JS · ❤️</span>
       <span>Bogotá, Colombia 🇨🇴</span>
     </footer>
 

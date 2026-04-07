@@ -25,26 +25,16 @@
         max-width: 860px;
         margin: 0 auto;
       }
-      @media (min-width: 640px) {
-        .page-header {
-          padding: 5rem 2rem 3.5rem;
-        }
-      }
-      @media (min-width: 900px) {
-        .page-header {
-          padding: 5rem 2.5rem 3.5rem;
-        }
-      }
+      @media (min-width: 640px) { .page-header { padding: 5rem 2rem 3.5rem; } }
+      @media (min-width: 900px) { .page-header { padding: 5rem 2.5rem 3.5rem; } }
 
       .page-title {
-        font-family: "Inter", sans-serif;
         font-weight: 800;
         font-size: clamp(2.2rem, 7vw, 3.5rem);
         line-height: 1.05;
         letter-spacing: -0.04em;
         margin-bottom: 1rem;
       }
-
       .page-subtitle {
         color: var(--muted);
         font-size: 1rem;
@@ -56,27 +46,18 @@
       .filter-wrap {
         padding: 0 1.25rem;
         max-width: 860px;
-        margin: 0 auto 2.5rem;
+        margin: 0 auto 2rem;
       }
-      @media (min-width: 640px) {
-        .filter-wrap {
-          padding: 0 2rem;
-        }
-      }
-      @media (min-width: 900px) {
-        .filter-wrap {
-          padding: 0 2.5rem;
-        }
-      }
+      @media (min-width: 640px) { .filter-wrap { padding: 0 2rem; } }
+      @media (min-width: 900px) { .filter-wrap { padding: 0 2.5rem; } }
 
       .filter-bar {
         display: flex;
         gap: 0.4rem;
         flex-wrap: wrap;
       }
-
       .filter-btn {
-        padding: 0.4rem 1rem;
+        padding: 0.35rem 1rem;
         font-family: "DM Mono", monospace;
         font-size: 0.72rem;
         letter-spacing: 0.06em;
@@ -86,7 +67,6 @@
         border-radius: 999px;
         cursor: pointer;
         transition: all 0.2s;
-        white-space: nowrap;
       }
       .filter-btn:hover {
         color: var(--text);
@@ -94,7 +74,7 @@
       }
       .filter-btn.active {
         color: var(--accent);
-        border-color: rgba(167, 139, 250, 0.5);
+        border-color: var(--accent);
         background: var(--glow);
       }
 
@@ -104,26 +84,16 @@
         max-width: 860px;
         margin: 0 auto;
       }
-      @media (min-width: 640px) {
-        .projects-wrap {
-          padding: 0 2rem;
-        }
-      }
-      @media (min-width: 900px) {
-        .projects-wrap {
-          padding: 0 2.5rem;
-        }
-      }
+      @media (min-width: 640px) { .projects-wrap { padding: 0 2rem; } }
+      @media (min-width: 900px) { .projects-wrap { padding: 0 2.5rem; } }
 
       .projects-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 0.75rem;
       }
       @media (min-width: 640px) {
-        .projects-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
+        .projects-grid { grid-template-columns: repeat(2, 1fr); }
       }
 
       /* ── PROJECT CARD ── */
@@ -131,91 +101,29 @@
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        overflow: hidden;
         text-decoration: none;
         display: flex;
         flex-direction: column;
-        transition:
-          border-color 0.25s,
-          transform 0.25s;
-        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
       }
       .project-card:hover {
-        border-color: rgba(167, 139, 250, 0.35);
-        transform: translateY(-3px);
-      }
-      .project-card:hover .pc-terminal-header .t-dot:nth-child(1) {
-        background: #ff5f57;
-      }
-      .project-card:hover .pc-terminal-header .t-dot:nth-child(2) {
-        background: #febc2e;
-      }
-      .project-card:hover .pc-terminal-header .t-dot:nth-child(3) {
-        background: #28c840;
-      }
-      .project-card:hover .pc-name {
-        color: var(--accent);
-      }
-
-      /* Terminal preview inside card */
-      .pc-preview {
-        padding: 1.25rem 1.25rem 0;
-        background: linear-gradient(to bottom, var(--surface2), transparent);
-      }
-      .pc-terminal {
-        background: #191a23;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      .pc-terminal-header {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.55rem 0.75rem;
-        border-bottom: 1px solid var(--border);
+        border-color: var(--accent);
         background: var(--surface2);
       }
-      .pc-terminal-header .t-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--border);
-        transition: background 0.25s;
-      }
-      .pc-terminal-body {
-        padding: 0.85rem 0.85rem;
-        font-family: "DM Mono", monospace;
-        font-size: 0.75rem;
-        line-height: 1.8;
-        min-height: 80px;
-      }
-      .term-cmd {
-        color: #50fa7b;
-      }
-      .term-out {
-        color: var(--muted);
-      }
-      .term-key {
-        color: #8be9fd;
-      }
-      .term-val {
-        color: var(--accent);
-      }
+      .project-card:hover .pc-name { color: var(--accent); }
+      .project-card:hover .pc-link { color: var(--accent); }
 
-      /* Card body */
       .pc-body {
-        padding: 1.25rem;
+        padding: 1.5rem;
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 0.6rem;
+        gap: 0.5rem;
       }
       .pc-meta-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 0.1rem;
       }
       .pc-name {
         font-weight: 700;
@@ -224,10 +132,11 @@
         letter-spacing: -0.01em;
         transition: color 0.2s;
       }
-      .pc-year {
+      .pc-badge {
         font-family: "DM Mono", monospace;
-        font-size: 0.68rem;
-        color: var(--muted);
+        font-size: 0.63rem;
+        color: var(--accent3);
+        letter-spacing: 0.06em;
       }
       .pc-desc {
         color: var(--muted);
@@ -239,69 +148,46 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.35rem;
-        margin-top: 0.5rem;
+        margin-top: 0.25rem;
       }
       .pc-footer {
-        padding: 0.75rem 1.25rem 1.25rem;
+        padding: 0.85rem 1.5rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         border-top: 1px solid var(--border);
-        margin-top: 0.25rem;
       }
       .pc-type {
         font-family: "DM Mono", monospace;
-        font-size: 0.65rem;
-        letter-spacing: 0.1em;
+        font-size: 0.63rem;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--accent);
+        color: var(--muted);
       }
       .pc-link {
         font-size: 0.82rem;
         color: var(--muted);
         font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
         transition: color 0.2s;
-      }
-      .project-card:hover .pc-link {
-        color: var(--accent);
       }
 
       /* ── SKILLS SECTION ── */
       .skills-section {
-        padding: 5rem 1.25rem;
+        padding: 4rem 1.25rem;
         max-width: 860px;
         margin: 0 auto;
       }
-      @media (min-width: 640px) {
-        .skills-section {
-          padding: 5rem 2rem;
-        }
-      }
-      @media (min-width: 900px) {
-        .skills-section {
-          padding: 5rem 2.5rem;
-        }
-      }
+      @media (min-width: 640px) { .skills-section { padding: 4rem 2rem; } }
+      @media (min-width: 900px) { .skills-section { padding: 4rem 2.5rem; } }
 
       .skills-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 1rem;
-        margin-top: 2rem;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
       }
-      @media (min-width: 480px) {
-        .skills-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-      @media (min-width: 900px) {
-        .skills-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
+      @media (min-width: 480px) { .skills-grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (min-width: 900px) { .skills-grid { grid-template-columns: repeat(3, 1fr); } }
 
       .skill-card {
         background: var(--surface);
@@ -310,14 +196,12 @@
         padding: 1.25rem;
         transition: border-color 0.2s;
       }
-      .skill-card:hover {
-        border-color: rgba(167, 139, 250, 0.3);
-      }
+      .skill-card:hover { border-color: var(--accent); }
 
       .skill-cat {
         font-family: "DM Mono", monospace;
-        font-size: 0.65rem;
-        letter-spacing: 0.14em;
+        font-size: 0.63rem;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--accent);
         margin-bottom: 0.85rem;
@@ -333,45 +217,34 @@
     <div class="grid-bg"></div>
 
     <nav>
-      <a href="./index.html" class="nav-logo">&gt;_</a>
-      <div>
-        <ul class="nav-links" id="nav-links">
-          <li><a href="./index.html">Home</a></li>
-          <li><a href="./projects.html" class="active">Projects</a></li>
-          <li><a href="./experience.html">Experience</a></li>
-          <li><a href="./contact.html">Contact</a></li>
-          <li>
-            <a
-              href="https://github.com/migueteado"
-              target="_blank"
-              class="nav-icon"
-              aria-label="GitHub"
-              ><i class="fa-brands fa-github"></i
-            ></a>
-          </li>
-          <li>
-            <a
-              href="https://www.linkedin.com/in/migueteado/"
-              target="_blank"
-              class="nav-icon"
-              aria-label="LinkedIn"
-              ><i class="fa-brands fa-linkedin-in"></i
-            ></a>
-          </li>
-        </ul>
+      <a href="./index.html" class="nav-logo">MV</a>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="./projects.html" class="active">Projects</a></li>
+        <li><a href="./experience.html">Experience</a></li>
+        <li><a href="./contact.html">Contact</a></li>
+      </ul>
+
+      <div class="nav-right">
         <div class="nav-status">
           <div class="status-dot"></div>
-          <span>Open to work</span>
+          <span class="nav-status-text">Open to work</span>
         </div>
+        <a href="https://github.com/migueteado" target="_blank" class="nav-icon" aria-label="GitHub">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/migueteado/" target="_blank" class="nav-icon" aria-label="LinkedIn">
+          <i class="fa-brands fa-linkedin-in"></i>
+        </a>
+        <button
+          class="nav-toggle"
+          onclick="document.getElementById('nav-links').classList.toggle('open')"
+          aria-label="Menu"
+        >
+          <span></span><span></span><span></span>
+        </button>
       </div>
-
-      <button
-        class="nav-toggle"
-        onclick="document.getElementById('nav-links').classList.toggle('open')"
-        aria-label="Menu"
-      >
-        <span></span><span></span><span></span>
-      </button>
     </nav>
 
     <div class="page">
@@ -387,10 +260,9 @@
         </p>
       </div>
 
-      <hr
-        class="gradient-divider"
-        style="max-width: 860px; margin: 0 auto 2.5rem; padding: 0 2.5rem"
-      />
+      <div style="max-width: 860px; margin: 0 auto 2rem; padding: 0 1.25rem">
+        <hr class="gradient-divider" />
+      </div>
 
       <!-- FILTER -->
       <div class="filter-wrap fade-up d3">
@@ -424,7 +296,7 @@
             <div class="pc-body">
               <div class="pc-meta-row">
                 <div class="pc-name">Dispatch</div>
-                <div class="pc-year">Production</div>
+                <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
                 Fulfillment routing and warehouse assignment system. Selects the
@@ -452,7 +324,7 @@
             <div class="pc-body">
               <div class="pc-meta-row">
                 <div class="pc-name">Resolve</div>
-                <div class="pc-year">Production</div>
+                <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
                 Customer support operations platform with multi-provider
@@ -480,7 +352,7 @@
             <div class="pc-body">
               <div class="pc-meta-row">
                 <div class="pc-name">Scope</div>
-                <div class="pc-year">Production</div>
+                <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
                 Ad channel monitoring tool integrating with YouTube and Google
@@ -508,7 +380,7 @@
             <div class="pc-body">
               <div class="pc-meta-row">
                 <div class="pc-name">Shield</div>
-                <div class="pc-year">Production</div>
+                <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
                 Dispute automation and chargeback prevention system. Collects
@@ -532,7 +404,7 @@
             <div class="pc-body">
               <div class="pc-meta-row">
                 <div class="pc-name">Nexus</div>
-                <div class="pc-year">Production</div>
+                <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
                 Payment orchestration layer across Stripe, PayPal, Klarna,
@@ -556,7 +428,7 @@
             <div class="pc-body">
               <div class="pc-meta-row">
                 <div class="pc-name">Pulse</div>
-                <div class="pc-year">Production</div>
+                <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
                 Real-time cart tracking and recovery service. Collects customer
@@ -582,24 +454,8 @@
       <div class="skills-section">
         <hr class="gradient-divider" style="margin-bottom: 3rem" />
         <div class="section-label fade-up d1">Skills</div>
-        <h2
-          style="
-            font-family: &quot;Inter&quot;, sans-serif;
-            font-weight: 800;
-            font-size: 1.75rem;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.5rem;
-          "
-          class="fade-up d2"
-        >
-          Tech Stack
-        </h2>
-        <p
-          style="color: var(--muted); font-size: 0.95rem; margin-bottom: 0"
-          class="fade-up d2"
-        >
-          What I reach for and why.
-        </p>
+        <h2 class="fade-up d2" style="font-weight: 800; font-size: 1.75rem; letter-spacing: -0.03em; margin-bottom: 0.35rem;">Tech Stack</h2>
+        <p class="fade-up d2" style="color: var(--muted); font-size: 0.95rem;">What I reach for and why.</p>
         <div class="skills-grid">
           <div class="skill-card fade-up d2">
             <div class="skill-cat">Languages &amp; Runtime</div>
@@ -666,15 +522,9 @@
       </div>
     </div>
 
-    <footer>
+        <footer>
       <span>© 2026 Miguel Villalobos</span>
-      <span
-        ><a
-          href="https://github.com/migueteado"
-          style="color: var(--muted); text-decoration: none"
-          >github.com/migueteado</a
-        ></span
-      >
+      <span>Built with HTML · CSS · JS · ❤️</span>
       <span>Bogotá, Colombia 🇨🇴</span>
     </footer>
 
