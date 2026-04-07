@@ -107,6 +107,14 @@ nav div .nav-status {
 .nav-status-text {
   display: none;
 }
+a.nav-status {
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+a.nav-status:hover {
+  opacity: 0.75;
+}
 @media (min-width: 640px) {
   .nav-status-text {
     display: inline;
