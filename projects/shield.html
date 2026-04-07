@@ -1,168 +1,237 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shield · Miguel Villalobos</title>
-<link rel="icon" type="image/svg+xml" href="../favicon.svg">
-<link rel="stylesheet" href="../style.css">
-<link rel="stylesheet" href="project-page.css">
-</head>
-<body>
-<div class="grid-bg"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shield · Miguel Villalobos</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="project-page.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/fontawesome.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/brands.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="grid-bg"></div>
 
-<nav>
-  <a href="../index.html" class="nav-logo">&gt;_</a>
-  <ul class="nav-links" id="nav-links">
-    <li><a href="../index.html">Home</a></li>
-    <li><a href="../projects.html" class="active">Projects</a></li>
-    <li><a href="../experience.html">Experience</a></li>
-    <li><a href="../contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-status">
-    <div class="status-dot"></div>
-    <span>Open to work</span>
-  </div>
-  <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<div class="page">
-
-  <a href="../projects.html" class="back-link fade-up d1">← Back to Projects</a>
-
-  <div class="project-header">
-    <div class="project-label fade-up d1">Dispute Management</div>
-    <h1 class="project-title fade-up d2">Shield</h1>
-    <p class="project-tagline fade-up d3">
-      Dispute automation and chargeback prevention system — collecting evidence, generating documents, and submitting responses to payment providers automatically.
-    </p>
-    <div class="project-meta fade-up d4">
-      <span class="meta-badge accent">Full Stack</span>
-      <span class="meta-badge">BÆRSkin Tactical · DivBrands</span>
-      <span class="meta-badge">Production</span>
-      <span class="meta-badge">Microservice</span>
-    </div>
-  </div>
-
-  <div style="max-width:860px;margin:0 auto;padding:0 1.25rem 2rem;">
-    <hr class="gradient-divider">
-  </div>
-
-  <div class="project-content">
-
-    <!-- OVERVIEW -->
-    <div class="section-card fade-up d2">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Overview</span>
-      </div>
-      <div class="section-card-body">
-        <p class="overview-text">
-          Shield is a <strong>full-stack dispute handling application</strong> that integrates with payment providers to receive dispute notifications, automatically collect relevant evidence, and submit structured response documents to contest chargebacks on behalf of the business.
-        </p>
-        <p class="overview-text" style="margin-top:1rem;">
-          The project demonstrates expertise in <strong>payment provider webhook integrations</strong>, document generation pipelines, and building internal tooling that reduces manual effort in high-stakes financial dispute workflows.
-        </p>
-      </div>
-    </div>
-
-    <!-- FEATURES -->
-    <div class="section-card fade-up d3">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Features</span>
-      </div>
-      <div class="section-card-body">
-        <ul class="feature-list">
-          <li class="feature-item"><span class="feature-dot"></span>API for receiving operations requests from internal teams and payment provider webhooks</li>
-          <li class="feature-item"><span class="feature-dot"></span>Asynchronous workers to collect evidence from order history, fulfillment records, and customer data</li>
-          <li class="feature-item"><span class="feature-dot"></span>Internal UI to review collected evidence and submit final dispute documents</li>
-          <li class="feature-item"><span class="feature-dot"></span>PDF generator and WYSIWYG editor for building structured chargeback response documents</li>
+    <nav>
+      <a href="../index.html" class="nav-logo">&gt;_</a>
+      <div>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../projects.html" class="active">Projects</a></li>
+          <li><a href="../experience.html">Experience</a></li>
+          <li><a href="../contact.html">Contact</a></li>
+          <li>
+            <a
+              href="https://github.com/migueteado"
+              target="_blank"
+              class="nav-icon"
+              aria-label="GitHub"
+              ><i class="fa-brands fa-github"></i
+            ></a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/in/migueteado/"
+              target="_blank"
+              class="nav-icon"
+              aria-label="LinkedIn"
+              ><i class="fa-brands fa-linkedin-in"></i
+            ></a>
+          </li>
         </ul>
-      </div>
-    </div>
-
-    <!-- ARCHITECTURE -->
-    <div class="section-card fade-up d3">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Architecture</span>
-      </div>
-      <div class="section-card-body">
-        <div class="arch-grid">
-          <div class="arch-item full">
-            <div class="arch-item-label">System Context</div>
-            <div class="arch-item-desc">Part of a broader microservices ecosystem. Shield listens for dispute events from payment providers via webhooks and pulls evidence from other internal services to build response packages.</div>
-          </div>
-          <div class="arch-item">
-            <div class="arch-item-label">Frontend</div>
-            <div class="arch-item-desc">Internal UI for operations teams to review auto-collected evidence, edit documents using a rich WYSIWYG editor, and submit final responses to payment providers.</div>
-          </div>
-          <div class="arch-item">
-            <div class="arch-item-label">Backend API</div>
-            <div class="arch-item-desc">Handles webhook ingestion from payment providers and requests from the frontend. Orchestrates evidence collection and document generation flows.</div>
-          </div>
-          <div class="arch-item">
-            <div class="arch-item-label">Async Workers</div>
-            <div class="arch-item-desc">Inngest functions collect evidence asynchronously from order, fulfillment, and customer records after a dispute is received — with retry logic for reliability.</div>
-          </div>
-          <div class="arch-item">
-            <div class="arch-item-label">Database</div>
-            <div class="arch-item-desc">MongoDB stores dispute records, collected evidence, document drafts, and submission history in a flexible document model suited to varied dispute data shapes.</div>
-          </div>
+        <div class="nav-status">
+          <div class="status-dot"></div>
+          <span>Open to work</span>
         </div>
       </div>
-    </div>
 
-    <!-- TECH STACK -->
-    <div class="section-card fade-up d4">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Tech Stack</span>
+      <button
+        class="nav-toggle"
+        onclick="document.getElementById('nav-links').classList.toggle('open')"
+        aria-label="Menu"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <div class="page">
+      <div class="proj-breadcrumb fade-up d1">
+        <a href="../projects.html">← Projects</a>
+        <span class="sep">/</span>
+        <span class="current">Shield</span>
       </div>
-      <div class="section-card-body">
-        <div class="stack-group">
-          <div class="stack-row">
-            <div class="stack-row-label">Frontend</div>
-            <div class="stack-tags">
-              <span class="tag hot">Next.js</span>
-              <span class="tag hot">React</span>
-              <span class="tag">Tailwind CSS</span>
-              <span class="tag">shadcn/ui</span>
-              <span class="tag">Slate</span>
+
+      <div class="proj-layout">
+        <!-- MAIN CONTENT -->
+        <main class="proj-main fade-up d2">
+          <h1 class="proj-title">Shield</h1>
+
+          <div class="proj-section">
+            <h2>Overview</h2>
+            <p>
+              Shield is a
+              <strong>full-stack dispute handling application</strong> that
+              integrates with payment providers to receive dispute
+              notifications, automatically collect relevant evidence, and submit
+              structured response documents to contest chargebacks on behalf of
+              the business.
+            </p>
+            <p>
+              The system reduces the manual effort involved in chargeback
+              responses — evidence is collected automatically from order
+              history, fulfillment records, and customer data, then surfaced in
+              a WYSIWYG editor where teams can review and finalize documents
+              before submission.
+            </p>
+          </div>
+
+          <div class="proj-section">
+            <h2>Features</h2>
+            <ul class="proj-features">
+              <li>
+                API for receiving operations requests from internal teams and
+                payment provider webhooks
+              </li>
+              <li>
+                Asynchronous workers to collect evidence from order history,
+                fulfillment records, and customer data
+              </li>
+              <li>
+                Internal UI to review collected evidence and submit final
+                dispute documents
+              </li>
+              <li>
+                PDF generator and WYSIWYG editor for building structured
+                chargeback response documents
+              </li>
+            </ul>
+          </div>
+
+          <div class="proj-section">
+            <h2>Architecture</h2>
+            <p>
+              Part of a broader microservices ecosystem. Shield listens for
+              dispute events from payment providers via webhooks and pulls
+              evidence from other internal services to build response packages.
+            </p>
+            <div class="proj-arch" style="margin-top: 1.25rem">
+              <div class="proj-arch-row">
+                <div class="proj-arch-key">Frontend</div>
+                <div class="proj-arch-val">
+                  Internal UI for operations teams to review auto-collected
+                  evidence, edit documents in a WYSIWYG editor, and submit final
+                  responses to payment providers.
+                </div>
+              </div>
+              <div class="proj-arch-row">
+                <div class="proj-arch-key">API</div>
+                <div class="proj-arch-val">
+                  Handles webhook ingestion from payment providers and requests
+                  from the frontend. Orchestrates evidence collection and
+                  document generation flows.
+                </div>
+              </div>
+              <div class="proj-arch-row">
+                <div class="proj-arch-key">Workers</div>
+                <div class="proj-arch-val">
+                  Inngest functions collect evidence asynchronously after a
+                  dispute is received — pulling from order, fulfillment, and
+                  customer records — with retry logic for reliability.
+                </div>
+              </div>
+              <div class="proj-arch-row">
+                <div class="proj-arch-key">Database</div>
+                <div class="proj-arch-val">
+                  MongoDB stores dispute records, collected evidence, document
+                  drafts, and submission history in a flexible document model
+                  suited to varied dispute data shapes.
+                </div>
+              </div>
             </div>
           </div>
-          <div class="stack-row">
-            <div class="stack-row-label">Backend</div>
-            <div class="stack-tags">
-              <span class="tag hot">TypeScript</span>
-              <span class="tag hot">Bun</span>
-              <span class="tag hot">Elysia.js</span>
-              <span class="tag hot">Inngest</span>
-              <span class="tag">MongoDB</span>
-              <span class="tag">Docker</span>
-              <span class="tag">GCP Compute Engine</span>
+
+          <div class="proj-nav">
+            <a href="scope.html">← Scope</a>
+            <a href="nexus.html">Nexus →</a>
+          </div>
+        </main>
+
+        <!-- SIDEBAR -->
+        <aside class="proj-sidebar fade-up d3">
+          <div class="proj-sidebar-card">
+            <div class="proj-sidebar-top">
+              <div class="proj-sidebar-name">Shield</div>
+              <div class="proj-sidebar-badges">
+                <span class="proj-sidebar-badge accent">Full Stack</span>
+                <span class="proj-sidebar-badge">Production</span>
+                <span class="proj-sidebar-badge">Microservice</span>
+              </div>
+            </div>
+            <div class="proj-sidebar-body">
+              <p class="proj-sidebar-desc">
+                Dispute automation and chargeback prevention — collecting
+                evidence, generating PDF response documents, and submitting them
+                to payment providers automatically.
+              </p>
+              <div>
+                <div class="proj-sidebar-section-label">Frontend</div>
+                <div class="proj-sidebar-tags">
+                  <span class="tag hot">Next.js</span>
+                  <span class="tag hot">React</span>
+                  <span class="tag">Tailwind CSS</span>
+                  <span class="tag">shadcn/ui</span>
+                  <span class="tag">Slate</span>
+                </div>
+              </div>
+              <div>
+                <div class="proj-sidebar-section-label">Backend</div>
+                <div class="proj-sidebar-tags">
+                  <span class="tag hot">TypeScript</span>
+                  <span class="tag hot">Bun</span>
+                  <span class="tag hot">Elysia.js</span>
+                  <span class="tag hot">Inngest</span>
+                  <span class="tag">MongoDB</span>
+                  <span class="tag">Docker</span>
+                  <span class="tag">GCP</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
 
-  </div>
-</div>
+    <footer>
+      <span>© 2026 Miguel Villalobos</span>
+      <span
+        ><a
+          href="../projects.html"
+          style="color: var(--muted); text-decoration: none"
+          >← All Projects</a
+        ></span
+      >
+      <span>Bogotá, Colombia 🇨🇴</span>
+    </footer>
 
-<footer>
-  <span>© 2026 Miguel Villalobos</span>
-  <span><a href="../projects.html" style="color:var(--muted);text-decoration:none;">← All Projects</a></span>
-  <span>Bogotá, Colombia 🇨🇴</span>
-</footer>
-
-<script>
-document.querySelectorAll('.nav-links a').forEach(a =>
-  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
-);
-</script>
-</body>
+    <script>
+      document
+        .querySelectorAll(".nav-links a")
+        .forEach((a) =>
+          a.addEventListener("click", () =>
+            document.getElementById("nav-links").classList.remove("open"),
+          ),
+        );
+    </script>
+  </body>
 </html>

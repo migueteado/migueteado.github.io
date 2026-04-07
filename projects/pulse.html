@@ -1,153 +1,213 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pulse · Miguel Villalobos</title>
-<link rel="icon" type="image/svg+xml" href="../favicon.svg">
-<link rel="stylesheet" href="../style.css">
-<link rel="stylesheet" href="project-page.css">
-</head>
-<body>
-<div class="grid-bg"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pulse · Miguel Villalobos</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="project-page.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/fontawesome.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/brands.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="grid-bg"></div>
 
-<nav>
-  <a href="../index.html" class="nav-logo">&gt;_</a>
-  <ul class="nav-links" id="nav-links">
-    <li><a href="../index.html">Home</a></li>
-    <li><a href="../projects.html" class="active">Projects</a></li>
-    <li><a href="../experience.html">Experience</a></li>
-    <li><a href="../contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-status">
-    <div class="status-dot"></div>
-    <span>Open to work</span>
-  </div>
-  <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<div class="page">
-
-  <a href="../projects.html" class="back-link fade-up d1">← Back to Projects</a>
-
-  <div class="project-header">
-    <div class="project-label fade-up d1">Cart Tracking &amp; Recovery</div>
-    <h1 class="project-title fade-up d2">Pulse</h1>
-    <p class="project-tagline fade-up d3">
-      Real-time cart tracking and recovery system — collecting customer activity, detecting abandoned carts, and triggering automated recovery campaigns.
-    </p>
-    <div class="project-meta fade-up d4">
-      <span class="meta-badge accent">Backend</span>
-      <span class="meta-badge">BÆRSkin Tactical · DivBrands</span>
-      <span class="meta-badge">Production</span>
-      <span class="meta-badge">Standalone Service</span>
-    </div>
-  </div>
-
-  <div style="max-width:860px;margin:0 auto;padding:0 1.25rem 2rem;">
-    <hr class="gradient-divider">
-  </div>
-
-  <div class="project-content">
-
-    <!-- OVERVIEW -->
-    <div class="section-card fade-up d2">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Overview</span>
-      </div>
-      <div class="section-card-body">
-        <p class="overview-text">
-          Pulse is a <strong>backend cart tracking and recovery service</strong> that collects real-time customer activity, detects when a cart has been abandoned based on inactivity thresholds, and automatically triggers recovery campaigns to re-engage potential customers before the sale is lost.
-        </p>
-        <p class="overview-text" style="margin-top:1rem;">
-          The project demonstrates expertise in <strong>event-driven architectures</strong>, real-time data ingestion, and building behavioral tracking systems that feed directly into marketing automation.
-        </p>
-      </div>
-    </div>
-
-    <!-- FEATURES -->
-    <div class="section-card fade-up d3">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Features</span>
-      </div>
-      <div class="section-card-body">
-        <ul class="feature-list">
-          <li class="feature-item"><span class="feature-dot"></span>High-throughput API for ingesting real-time cart tracking data from storefronts</li>
-          <li class="feature-item"><span class="feature-dot"></span>Cart abandonment detection based on configurable inactivity thresholds</li>
-          <li class="feature-item"><span class="feature-dot"></span>Automated cart recovery campaign triggers for re-engagement workflows</li>
+    <nav>
+      <a href="../index.html" class="nav-logo">&gt;_</a>
+      <div>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../projects.html" class="active">Projects</a></li>
+          <li><a href="../experience.html">Experience</a></li>
+          <li><a href="../contact.html">Contact</a></li>
+          <li>
+            <a
+              href="https://github.com/migueteado"
+              target="_blank"
+              class="nav-icon"
+              aria-label="GitHub"
+              ><i class="fa-brands fa-github"></i
+            ></a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/in/migueteado/"
+              target="_blank"
+              class="nav-icon"
+              aria-label="LinkedIn"
+              ><i class="fa-brands fa-linkedin-in"></i
+            ></a>
+          </li>
         </ul>
-      </div>
-    </div>
-
-    <!-- ARCHITECTURE -->
-    <div class="section-card fade-up d3">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Architecture</span>
-      </div>
-      <div class="section-card-body">
-        <div class="arch-grid">
-          <div class="arch-item full">
-            <div class="arch-item-label">System Context</div>
-            <div class="arch-item-desc">A standalone backend service. Pulse receives tracking events from storefronts, maintains cart state, and emits campaign triggers consumed by marketing automation systems.</div>
-          </div>
-          <div class="arch-item">
-            <div class="arch-item-label">Backend API</div>
-            <div class="arch-item-desc">Receives tracking logs from client-side integrations. Exposes endpoints for cart state queries and manual campaign triggers.</div>
-          </div>
-          <div class="arch-item">
-            <div class="arch-item-label">Async Workers</div>
-            <div class="arch-item-desc">Inngest functions handle abandonment detection and campaign triggering asynchronously — evaluating cart state on a schedule and firing recovery workflows when thresholds are met.</div>
-          </div>
-          <div class="arch-item">
-            <div class="arch-item-label">Database</div>
-            <div class="arch-item-desc">PostgreSQL stores cart sessions, tracking events, abandonment records, and campaign trigger history.</div>
-          </div>
+        <div class="nav-status">
+          <div class="status-dot"></div>
+          <span>Open to work</span>
         </div>
       </div>
-    </div>
 
-    <!-- TECH STACK -->
-    <div class="section-card fade-up d4">
-      <div class="section-card-header">
-        <span class="section-card-icon">◈</span>
-        <span class="section-card-title">Tech Stack</span>
+      <button
+        class="nav-toggle"
+        onclick="document.getElementById('nav-links').classList.toggle('open')"
+        aria-label="Menu"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <div class="page">
+      <div class="proj-breadcrumb fade-up d1">
+        <a href="../projects.html">← Projects</a>
+        <span class="sep">/</span>
+        <span class="current">Pulse</span>
       </div>
-      <div class="section-card-body">
-        <div class="stack-group">
-          <div class="stack-row">
-            <div class="stack-row-label">Backend</div>
-            <div class="stack-tags">
-              <span class="tag hot">TypeScript</span>
-              <span class="tag hot">Bun</span>
-              <span class="tag hot">Elysia.js</span>
-              <span class="tag hot">Inngest</span>
-              <span class="tag">PostgreSQL</span>
-              <span class="tag">Docker</span>
-              <span class="tag">GCP Compute Engine</span>
+
+      <div class="proj-layout">
+        <!-- MAIN CONTENT -->
+        <main class="proj-main fade-up d2">
+          <h1 class="proj-title">Pulse</h1>
+
+          <div class="proj-section">
+            <h2>Overview</h2>
+            <p>
+              Pulse is a
+              <strong>backend cart tracking and recovery service</strong> that
+              collects real-time customer activity, detects when a cart has been
+              abandoned based on inactivity thresholds, and automatically
+              triggers recovery campaigns to re-engage potential customers
+              before the sale is lost.
+            </p>
+            <p>
+              The system operates as a standalone service — storefronts push
+              tracking events to Pulse via API, and asynchronous workers
+              evaluate cart state on a schedule, firing recovery workflows when
+              abandonment thresholds are met.
+            </p>
+          </div>
+
+          <div class="proj-section">
+            <h2>Features</h2>
+            <ul class="proj-features">
+              <li>
+                High-throughput API for ingesting real-time cart tracking data
+                from storefronts
+              </li>
+              <li>
+                Cart abandonment detection based on configurable inactivity
+                thresholds
+              </li>
+              <li>
+                Automated cart recovery campaign triggers for re-engagement
+                workflows
+              </li>
+            </ul>
+          </div>
+
+          <div class="proj-section">
+            <h2>Architecture</h2>
+            <p>
+              A standalone backend service. Pulse receives tracking events from
+              storefronts, maintains cart state, and emits campaign triggers
+              consumed by marketing automation systems.
+            </p>
+            <div class="proj-arch" style="margin-top: 1.25rem">
+              <div class="proj-arch-row">
+                <div class="proj-arch-key">API</div>
+                <div class="proj-arch-val">
+                  Receives tracking logs from client-side integrations. Exposes
+                  endpoints for cart state queries and manual campaign triggers.
+                </div>
+              </div>
+              <div class="proj-arch-row">
+                <div class="proj-arch-key">Workers</div>
+                <div class="proj-arch-val">
+                  Inngest functions handle abandonment detection and campaign
+                  triggering asynchronously — evaluating cart state on a
+                  schedule and firing recovery workflows when thresholds are
+                  met.
+                </div>
+              </div>
+              <div class="proj-arch-row">
+                <div class="proj-arch-key">Database</div>
+                <div class="proj-arch-val">
+                  PostgreSQL stores cart sessions, tracking events, abandonment
+                  records, and campaign trigger history.
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+
+          <div class="proj-nav">
+            <a href="nexus.html">← Nexus</a>
+            <a href="../projects.html">All Projects →</a>
+          </div>
+        </main>
+
+        <!-- SIDEBAR -->
+        <aside class="proj-sidebar fade-up d3">
+          <div class="proj-sidebar-card">
+            <div class="proj-sidebar-top">
+              <div class="proj-sidebar-name">Pulse</div>
+              <div class="proj-sidebar-badges">
+                <span class="proj-sidebar-badge accent">Backend</span>
+                <span class="proj-sidebar-badge">Production</span>
+                <span class="proj-sidebar-badge">Standalone</span>
+              </div>
+            </div>
+            <div class="proj-sidebar-body">
+              <p class="proj-sidebar-desc">
+                Real-time cart tracking and recovery system — collecting
+                customer activity, detecting abandoned carts, and triggering
+                automated recovery campaigns.
+              </p>
+              <div>
+                <div class="proj-sidebar-section-label">Backend</div>
+                <div class="proj-sidebar-tags">
+                  <span class="tag hot">TypeScript</span>
+                  <span class="tag hot">Bun</span>
+                  <span class="tag hot">Elysia.js</span>
+                  <span class="tag hot">Inngest</span>
+                  <span class="tag">PostgreSQL</span>
+                  <span class="tag">Docker</span>
+                  <span class="tag">GCP</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
 
-  </div>
-</div>
+    <footer>
+      <span>© 2026 Miguel Villalobos</span>
+      <span
+        ><a
+          href="../projects.html"
+          style="color: var(--muted); text-decoration: none"
+          >← All Projects</a
+        ></span
+      >
+      <span>Bogotá, Colombia 🇨🇴</span>
+    </footer>
 
-<footer>
-  <span>© 2026 Miguel Villalobos</span>
-  <span><a href="../projects.html" style="color:var(--muted);text-decoration:none;">← All Projects</a></span>
-  <span>Bogotá, Colombia 🇨🇴</span>
-</footer>
-
-<script>
-document.querySelectorAll('.nav-links a').forEach(a =>
-  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
-);
-</script>
-</body>
+    <script>
+      document
+        .querySelectorAll(".nav-links a")
+        .forEach((a) =>
+          a.addEventListener("click", () =>
+            document.getElementById("nav-links").classList.remove("open"),
+          ),
+        );
+    </script>
+  </body>
 </html>

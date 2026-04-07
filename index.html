@@ -6,6 +6,18 @@
     <title>Miguel Villalobos · Senior Backend Engineer</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/fontawesome.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/brands.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <style>
       /* ── HERO ──────────────────────────────── */
       .hero {
@@ -199,10 +211,10 @@
         padding-left: 0.75rem;
       }
       .tk {
-        color: #93c5fd;
+        color: #8be9fd;
       }
       .tv {
-        color: #fcd34d;
+        color: #f1fa8c;
       }
       .ts {
         color: var(--accent);
@@ -328,17 +340,38 @@
     <div class="grid-bg"></div>
 
     <nav>
-      <a href="index.html" class="nav-logo">&gt;_</a>
-      <ul class="nav-links" id="nav-links">
-        <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="experience.html">Experience</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-      <div class="nav-status">
-        <div class="status-dot"></div>
-        <span>Open to work</span>
+      <a href="./index.html" class="nav-logo">&gt;_</a>
+      <div>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="./index.html" class="active">Home</a></li>
+          <li><a href="./projects.html">Projects</a></li>
+          <li><a href="./experience.html">Experience</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+          <li>
+            <a
+              href="https://github.com/migueteado"
+              target="_blank"
+              class="nav-icon"
+              aria-label="GitHub"
+              ><i class="fa-brands fa-github"></i
+            ></a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/in/migueteado/"
+              target="_blank"
+              class="nav-icon"
+              aria-label="LinkedIn"
+              ><i class="fa-brands fa-linkedin-in"></i
+            ></a>
+          </li>
+        </ul>
+        <div class="nav-status">
+          <div class="status-dot"></div>
+          <span>Open to work</span>
+        </div>
       </div>
+
       <button
         class="nav-toggle"
         onclick="document.getElementById('nav-links').classList.toggle('open')"
@@ -365,21 +398,21 @@
           </p>
 
           <div class="hero-skills fade-up d4">
+            <span class="tag hot">System Design</span>
+            <span class="tag hot">High Scalability</span>
             <span class="tag hot">TypeScript</span>
-            <span class="tag hot">Node.js</span>
-            <span class="tag hot">PostgreSQL</span>
+            <span class="tag">Microservices</span>
+            <span class="tag">Event Driven</span>
+            <span class="tag">Node.js</span>
+            <span class="tag">SQL</span>
             <span class="tag">Next.js</span>
-            <span class="tag">React</span>
-            <span class="tag">Drizzle ORM</span>
             <span class="tag">Stripe</span>
-            <span class="tag">Shopify APIs</span>
           </div>
 
           <div class="hero-stats fade-up d5">
-            <div class="hero-stat"><strong>7+</strong> Years experience</div>
-            <div class="hero-stat"><strong>200K+</strong> Orders/month</div>
+            <div class="hero-stat"><strong>9+</strong> Years experience</div>
             <div class="hero-stat">
-              <strong>100%</strong> Incidents resolved
+              <strong>1M+</strong> Users impacted through my work
             </div>
           </div>
 
@@ -456,8 +489,8 @@
             <div class="qn-num">02</div>
             <div class="qn-title">Projects</div>
             <div class="qn-desc">
-              Distributed systems, APIs, and infrastructure tooling built at
-              scale.
+              Distributed systems, APIs, and infrastructure tooling built for
+              scalability and maintainability.
             </div>
             <div class="qn-arrow">↗</div>
           </a>
@@ -465,8 +498,8 @@
             <div class="qn-num">03</div>
             <div class="qn-title">Experience</div>
             <div class="qn-desc">
-              7+ years at BÆRSkin Tactical — from web dev to owning 5 production
-              services.
+              9+ years at BÆRSkin Tactical and other companies — from web dev to
+              system design and owning 5 production services.
             </div>
             <div class="qn-arrow">↗</div>
           </a>
@@ -474,8 +507,8 @@
             <div class="qn-num">04</div>
             <div class="qn-title">Contact</div>
             <div class="qn-desc">
-              Open to full-time backend roles. Remote worldwide. Resume
-              available.
+              Eager to chat about interesting topics. Open to full-time backend
+              and full-stack roles. Remote worldwide.
             </div>
             <div class="qn-arrow">↗</div>
           </a>
@@ -485,7 +518,7 @@
 
     <footer>
       <span>© 2026 Miguel Villalobos</span>
-      <span>Built with HTML · CSS · ☕</span>
+      <span>Built with HTML · CSS · JS · ❤️</span>
       <span>Bogotá, Colombia 🇨🇴</span>
     </footer>
 

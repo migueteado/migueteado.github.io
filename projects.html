@@ -6,6 +6,18 @@
     <title>Projects · Miguel Villalobos</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/fontawesome.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/brands.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <style>
       /* ── PAGE HEADER ── */
       .page-header {
@@ -151,7 +163,7 @@
         background: linear-gradient(to bottom, var(--surface2), transparent);
       }
       .pc-terminal {
-        background: #0f0f14;
+        background: #191a23;
         border: 1px solid var(--border);
         border-radius: 8px;
         overflow: hidden;
@@ -179,13 +191,13 @@
         min-height: 80px;
       }
       .term-cmd {
-        color: #86efac;
+        color: #50fa7b;
       }
       .term-out {
         color: var(--muted);
       }
       .term-key {
-        color: #93c5fd;
+        color: #8be9fd;
       }
       .term-val {
         color: var(--accent);
@@ -321,17 +333,38 @@
     <div class="grid-bg"></div>
 
     <nav>
-      <a href="index.html" class="nav-logo">&gt;_</a>
-      <ul class="nav-links" id="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="projects.html" class="active">Projects</a></li>
-        <li><a href="experience.html">Experience</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-      <div class="nav-status">
-        <div class="status-dot"></div>
-        <span>Open to work</span>
+      <a href="./index.html" class="nav-logo">&gt;_</a>
+      <div>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="./index.html">Home</a></li>
+          <li><a href="./projects.html" class="active">Projects</a></li>
+          <li><a href="./experience.html">Experience</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+          <li>
+            <a
+              href="https://github.com/migueteado"
+              target="_blank"
+              class="nav-icon"
+              aria-label="GitHub"
+              ><i class="fa-brands fa-github"></i
+            ></a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/in/migueteado/"
+              target="_blank"
+              class="nav-icon"
+              aria-label="LinkedIn"
+              ><i class="fa-brands fa-linkedin-in"></i
+            ></a>
+          </li>
+        </ul>
+        <div class="nav-status">
+          <div class="status-dot"></div>
+          <span>Open to work</span>
+        </div>
       </div>
+
       <button
         class="nav-toggle"
         onclick="document.getElementById('nav-links').classList.toggle('open')"
@@ -585,6 +618,7 @@
               <span class="tag hot">Elysia.js</span>
               <span class="tag">Drizzle ORM</span>
               <span class="tag">Inngest</span>
+              <span class="tag">RabbitMQ</span>
               <span class="tag">REST</span>
             </div>
           </div>
@@ -599,8 +633,8 @@
           <div class="skill-card fade-up d2">
             <div class="skill-cat">Architecture</div>
             <div class="skill-tags">
-              <span class="tag">Microservices</span>
-              <span class="tag">Event-Driven</span>
+              <span class="tag hot">Microservices</span>
+              <span class="tag hot">Event-Driven</span>
               <span class="tag">Background Jobs</span>
               <span class="tag">Webhooks</span>
             </div>
@@ -609,15 +643,20 @@
             <div class="skill-cat">Integrations</div>
             <div class="skill-tags">
               <span class="tag hot">Stripe</span>
-              <span class="tag hot">Shopify APIs</span>
-              <span class="tag">PayPal</span>
+              <span class="tag hot">PayPal</span>
+              <span class="tag hot">17 Track</span>
               <span class="tag">Klarna</span>
+              <span class="tag">Google Ads</span>
+              <span class="tag">Facebook Ads</span>
+              <span class="tag">YouTube</span>
+              <span class="tag">Shopify APIs</span>
             </div>
           </div>
           <div class="skill-card fade-up d4">
             <div class="skill-cat">Observability</div>
             <div class="skill-tags">
               <span class="tag hot">Sentry</span>
+              <span class="tag hot">Hookdeck</span>
               <span class="tag">Monitoring</span>
               <span class="tag">Alerting</span>
               <span class="tag">Incident Response</span>

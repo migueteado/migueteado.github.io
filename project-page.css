@@ -83,7 +83,7 @@
   color: var(--muted);
 }
 .meta-badge.accent {
-  border-color: rgba(167,139,250,0.35);
+  border-color: rgba(189,147,249,0.35);
   color: var(--accent);
   background: var(--glow);
 }
@@ -109,7 +109,7 @@
   overflow: hidden;
   transition: border-color 0.2s;
 }
-.section-card:hover { border-color: rgba(167,139,250,0.2); }
+.section-card:hover { border-color: rgba(189,147,249,0.2); }
 
 .section-card-header {
   padding: 1.1rem 1.5rem;
@@ -195,7 +195,7 @@
   padding: 1rem 1.1rem;
   transition: border-color 0.2s;
 }
-.arch-item:hover { border-color: rgba(167,139,250,0.3); }
+.arch-item:hover { border-color: rgba(189,147,249,0.3); }
 
 .arch-item-label {
   font-family: 'DM Mono', monospace;
