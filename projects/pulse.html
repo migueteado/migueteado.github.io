@@ -56,17 +56,21 @@
     </nav>
 
     <div class="page">
-      <div class="proj-breadcrumb fade-up d1">
-        <a href="../projects.html">← Projects</a>
-        <span class="sep">/</span>
-        <span class="current">Pulse</span>
-      </div>
+      <article class="proj-article fade-up d1">
+        <nav class="proj-article-breadcrumb">
+          <a href="../projects.html">← Projects</a>
+          <span class="sep">/</span>
+          <span class="current">Pulse</span>
+        </nav>
 
-      <div class="proj-layout">
-        <!-- MAIN CONTENT -->
-        <main class="proj-main fade-up d2">
-          <h1 class="proj-title">Pulse</h1>
-
+        <header class="proj-article-header">
+          <h1 class="proj-article-title">Pulse</h1>
+          <div class="proj-article-badges">
+            <span class="proj-article-badge accent">Backend</span>
+            <span class="proj-article-badge">Production</span>
+            <span class="proj-article-badge">Standalone</span>
+          </div>
+        </header>
           <div class="proj-section">
             <h2>Overview</h2>
             <p>
@@ -85,7 +89,23 @@
             </p>
           </div>
 
-          <div class="proj-section">
+
+        <section class="proj-section anim-section">
+          <div class="anim-hero">
+            <div class="anim-hero-header">
+              <span class="anim-hero-label">Real-time cart tracking &amp; recovery flow</span>
+              <button class="btn-ghost anim-btn" id="anim-replay" type="button">↺ Replay</button>
+            </div>
+            <canvas
+              class="anim-hero-canvas"
+              id="anim-hero"
+              width="720"
+              height="400"
+              aria-label="Pulse system animation: storefronts stream events into Pulse, which monitors carts for inactivity; when a cart is abandoned Pulse fires recovery campaigns through email, SMS, and push channels"
+            ></canvas>
+          </div>
+        </section>
+<div class="proj-section">
             <h2>Features</h2>
             <ul class="proj-features">
               <li>
@@ -103,7 +123,7 @@
             </ul>
           </div>
 
-          <div class="proj-section">
+        <div class="proj-section">
             <h2>Architecture</h2>
             <p>
               A standalone backend service. Pulse receives tracking events from
@@ -137,48 +157,31 @@
             </div>
           </div>
 
-          <div class="proj-nav">
-            <a href="nexus.html">← Nexus</a>
-            <a href="../projects.html">All Projects →</a>
+        <section class="proj-section">
+          <h2>Tech Stack</h2>
+          <div class="tech-stack">
+            <div class="tech-stack-group">
+              <div class="tech-stack-tags">
+                <span class="tag hot">TypeScript</span>
+                <span class="tag hot">Bun</span>
+                <span class="tag hot">Elysia.js</span>
+                <span class="tag hot">Inngest</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GCP</span>
+              </div>
+            </div>
           </div>
-        </main>
+        </section>
 
-        <!-- SIDEBAR -->
-        <aside class="proj-sidebar fade-up d3">
-          <div class="proj-sidebar-card">
-            <div class="proj-sidebar-top">
-              <div class="proj-sidebar-name">Pulse</div>
-              <div class="proj-sidebar-badges">
-                <span class="proj-sidebar-badge accent">Backend</span>
-                <span class="proj-sidebar-badge">Production</span>
-                <span class="proj-sidebar-badge">Standalone</span>
-              </div>
-            </div>
-            <div class="proj-sidebar-body">
-              <p class="proj-sidebar-desc">
-                Real-time cart tracking and recovery system — collecting
-                customer activity, detecting abandoned carts, and triggering
-                automated recovery campaigns.
-              </p>
-              <div>
-                <div class="proj-sidebar-section-label">Backend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">TypeScript</span>
-                  <span class="tag hot">Bun</span>
-                  <span class="tag hot">Elysia.js</span>
-                  <span class="tag hot">Inngest</span>
-                  <span class="tag">PostgreSQL</span>
-                  <span class="tag">Docker</span>
-                  <span class="tag">GCP</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
+        <div class="proj-nav">
+          <a href="nexus.html">← Nexus</a>
+          <a href="../projects.html">All Projects →</a>
+        </div>
+      </article>
     </div>
 
-        <footer>
+    <footer>
       <div class="footer-inner">
         <div class="footer-col">© 2026 Miguel Villalobos</div>
         <div class="footer-col footer-col--center">Built with HTML · CSS · JS · ❤️</div>
@@ -195,5 +198,6 @@
           ),
         );
     </script>
+    <script src="pulse.js"></script>
   </body>
 </html>

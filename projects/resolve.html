@@ -56,175 +56,183 @@
     </nav>
 
     <div class="page">
-      <div class="proj-breadcrumb fade-up d1">
-        <a href="../projects.html">← Projects</a>
-        <span class="sep">/</span>
-        <span class="current">Resolve</span>
-      </div>
+      <article class="proj-article fade-up d1">
+        <nav class="proj-article-breadcrumb">
+          <a href="../projects.html">← Projects</a>
+          <span class="sep">/</span>
+          <span class="current">Resolve</span>
+        </nav>
 
-      <div class="proj-layout">
-        <!-- MAIN CONTENT -->
-        <main class="proj-main fade-up d2">
-          <h1 class="proj-title">Resolve</h1>
-
-          <div class="proj-section">
-            <h2>Overview</h2>
-            <p>
-              Resolve is a
-              <strong>full-stack customer support operations platform</strong>
-              that enables support teams to handle order modifications,
-              cancellations, and refunds through a structured, auditable
-              workflow. Every operation passes through a review gate before
-              being committed to the live system, with rollback logic in case of
-              downstream failures.
-            </p>
-            <p>
-              The system integrates deeply with the existing order lifecycle and
-              connects to multiple payment providers — Stripe, PayPal, Klarna,
-              and Adyen — exposing a unified interface for customer support
-              teams regardless of which provider processed the original
-              transaction.
-            </p>
+        <header class="proj-article-header">
+          <h1 class="proj-article-title">Resolve</h1>
+          <div class="proj-article-badges">
+            <span class="proj-article-badge accent">Full Stack</span>
+            <span class="proj-article-badge">Production</span>
+            <span class="proj-article-badge">Microservice</span>
           </div>
+        </header>
 
-          <div class="proj-section">
-            <h2>Features</h2>
-            <ul class="proj-features">
-              <li>
-                API for receiving operations requests from customer support
-                departments
-              </li>
-              <li>
-                Internal UI to generate tickets, track processes, and review
-                pending operations
-              </li>
-              <li>
-                Warehouse and stock management tied to item changes and order
-                cancellations
-              </li>
-              <li>
-                Refund operations with Stripe, PayPal, Klarna, and Adyen
-                integrations
-              </li>
-              <li>
-                Logging system to keep a full audit trail of all CS department
-                operations
-              </li>
-              <li>
-                Review system requiring approval before committing changes to
-                the system
-              </li>
-              <li>
-                Rollback logic to safely undo operations in case of downstream
-                failures
-              </li>
-            </ul>
+        <section class="proj-section">
+          <h2>Overview</h2>
+          <p>
+            Resolve is a
+            <strong>full-stack customer support operations platform</strong>
+            that enables support teams to handle order modifications,
+            cancellations, and refunds through a structured, auditable
+            workflow. Every operation passes through a review gate before
+            being committed to the live system, with rollback logic in case of
+            downstream failures.
+          </p>
+          <p>
+            The system integrates deeply with the existing order lifecycle and
+            connects to multiple payment providers — Stripe, PayPal, Klarna,
+            and Adyen — exposing a unified interface for customer support
+            teams regardless of which provider processed the original
+            transaction.
+          </p>
+        </section>
+
+        <section class="proj-section anim-section">
+          <div class="anim-hero">
+            <canvas
+              class="anim-hero-canvas"
+              id="anim-hero"
+              width="720"
+              height="380"
+              aria-label="Resolve system animation: CS agents send tickets to the Resolve hub, which routes them to supervisors for review; approved tickets return to Resolve and dispatch to external Order and Payment services, which respond back to Resolve"
+            ></canvas>
+            <div class="anim-hero-footer">
+              <div class="anim-counter">
+                <span class="anim-counter-num" id="anim-counter">0</span>
+                <span class="anim-counter-label">tickets resolved</span>
+              </div>
+              <button class="btn-ghost anim-btn" id="anim-replay" type="button">↺ Replay</button>
+            </div>
           </div>
+        </section>
 
-          <div class="proj-section">
-            <h2>Architecture</h2>
-            <p>
-              Part of a broader microservices ecosystem. Resolve coordinates
-              with the order, fulfillment, and payment services to execute
-              support operations safely, emitting events consumed by downstream
-              services.
-            </p>
-            <div class="proj-arch" style="margin-top: 1.25rem">
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Frontend</div>
-                <div class="proj-arch-val">
-                  Internal UI for CS teams to create tickets, review pending
-                  operations, and submit or reject changes before they're
-                  committed to the system.
-                </div>
+        <section class="proj-section">
+          <h2>Features</h2>
+          <ul class="proj-features">
+            <li>
+              API for receiving operations requests from customer support
+              departments
+            </li>
+            <li>
+              Internal UI to generate tickets, track processes, and review
+              pending operations
+            </li>
+            <li>
+              Warehouse and stock management tied to item changes and order
+              cancellations
+            </li>
+            <li>
+              Refund operations with Stripe, PayPal, Klarna, and Adyen
+              integrations
+            </li>
+            <li>
+              Logging system to keep a full audit trail of all CS department
+              operations
+            </li>
+            <li>
+              Review system requiring approval before committing changes to
+              the system
+            </li>
+            <li>
+              Rollback logic to safely undo operations in case of downstream
+              failures
+            </li>
+          </ul>
+        </section>
+
+        <section class="proj-section">
+          <h2>Architecture</h2>
+          <p>
+            Part of a broader microservices ecosystem. Resolve coordinates
+            with the order, fulfillment, and payment services to execute
+            support operations safely, emitting events consumed by downstream
+            services.
+          </p>
+          <div class="proj-arch" style="margin-top: 1.25rem">
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Frontend</div>
+              <div class="proj-arch-val">
+                Internal UI for CS teams to create tickets, review pending
+                operations, and submit or reject changes before they're
+                committed to the system.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">API</div>
-                <div class="proj-arch-val">
-                  Handles requests from the frontend and other services. Manages
-                  the ticket lifecycle, review gates, and integration calls to
-                  payment providers.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">API</div>
+              <div class="proj-arch-val">
+                Handles requests from the frontend and other services. Manages
+                the ticket lifecycle, review gates, and integration calls to
+                payment providers.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Workers</div>
-                <div class="proj-arch-val">
-                  Inngest functions execute approved operations asynchronously —
-                  refunds, stock adjustments, cancellations — with retry logic
-                  and rollback handlers.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Workers</div>
+              <div class="proj-arch-val">
+                Inngest functions execute approved operations asynchronously —
+                refunds, stock adjustments, cancellations — with retry logic
+                and rollback handlers.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Database</div>
-                <div class="proj-arch-val">
-                  PostgreSQL stores tickets, operation logs, review states, and
-                  refund records with transactional guarantees for audit
-                  integrity.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Database</div>
+              <div class="proj-arch-val">
+                PostgreSQL stores tickets, operation logs, review states, and
+                refund records with transactional guarantees for audit
+                integrity.
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="proj-nav">
-            <a href="dispatch.html">← Dispatch</a>
-            <a href="scope.html">Scope →</a>
-          </div>
-        </main>
-
-        <!-- SIDEBAR -->
-        <aside class="proj-sidebar fade-up d3">
-          <div class="proj-sidebar-card">
-            <div class="proj-sidebar-top">
-              <div class="proj-sidebar-name">Resolve</div>
-              <div class="proj-sidebar-badges">
-                <span class="proj-sidebar-badge accent">Full Stack</span>
-                <span class="proj-sidebar-badge">Production</span>
-                <span class="proj-sidebar-badge">Microservice</span>
+        <section class="proj-section">
+          <h2>Tech Stack</h2>
+          <div class="tech-stack">
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Frontend</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">Next.js</span>
+                <span class="tag hot">React</span>
+                <span class="tag">Tailwind CSS</span>
+                <span class="tag">shadcn/ui</span>
               </div>
             </div>
-            <div class="proj-sidebar-body">
-              <p class="proj-sidebar-desc">
-                Customer support ops platform with multi-provider refunds, item
-                changes, cancellations, and a mandatory review workflow before
-                changes go live.
-              </p>
-              <div>
-                <div class="proj-sidebar-section-label">Frontend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">Next.js</span>
-                  <span class="tag hot">React</span>
-                  <span class="tag">Tailwind CSS</span>
-                  <span class="tag">shadcn/ui</span>
-                </div>
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Backend</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">TypeScript</span>
+                <span class="tag hot">Bun</span>
+                <span class="tag hot">Elysia.js</span>
+                <span class="tag hot">Inngest</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GCP</span>
               </div>
-              <div>
-                <div class="proj-sidebar-section-label">Backend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">TypeScript</span>
-                  <span class="tag hot">Bun</span>
-                  <span class="tag hot">Elysia.js</span>
-                  <span class="tag hot">Inngest</span>
-                  <span class="tag">PostgreSQL</span>
-                  <span class="tag">Docker</span>
-                  <span class="tag">GCP</span>
-                </div>
-              </div>
-              <div>
-                <div class="proj-sidebar-section-label">Payments</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">Stripe</span>
-                  <span class="tag hot">PayPal</span>
-                  <span class="tag">Klarna</span>
-                  <span class="tag">Adyen</span>
-                </div>
+            </div>
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Payments</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">Stripe</span>
+                <span class="tag hot">PayPal</span>
+                <span class="tag">Klarna</span>
+                <span class="tag">Adyen</span>
               </div>
             </div>
           </div>
-        </aside>
-      </div>
+        </section>
+
+        <div class="proj-nav">
+          <a href="dispatch.html">← Dispatch</a>
+          <a href="scope.html">Scope →</a>
+        </div>
+      </article>
     </div>
 
-        <footer>
+    <footer>
       <div class="footer-inner">
         <div class="footer-col">© 2026 Miguel Villalobos</div>
         <div class="footer-col footer-col--center">Built with HTML · CSS · JS · ❤️</div>
@@ -241,5 +249,6 @@
           ),
         );
     </script>
+    <script src="resolve.js"></script>
   </body>
 </html>
