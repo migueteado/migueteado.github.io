@@ -7,12 +7,13 @@
     muted: "#7a7670",
     accent: "#2d6a50",
     blue: "#3d6b96",
-    pulseRing: "#3d6b96",
-    pulseSoft: "rgba(61, 107, 150, 0.16)",
-    pulseSofter: "rgba(61, 107, 150, 0.10)",
-    pulseTint: "#eaf1f7",
+    pulseRing: "#5cb6e0",
+    pulseSoft: "rgba(92, 182, 224, 0.16)",
+    pulseSofter: "rgba(92, 182, 224, 0.10)",
+    pulseTint: "#eaf6fb",
   };
 
+  const ANIM_H = 400;
   const HUB_RADIUS = 50;
   const TROLLEY_COUNT = 10;
   const TROLLEY_RING_RADIUS = 110;
@@ -221,19 +222,19 @@
 
     layout() {
       this.hubX = this.logicalW / 2;
-      this.hubY = this.logicalH / 2;
+      this.hubY = ANIM_H / 2;
       this.hubR = HUB_RADIUS;
 
       this.storefront = {
         x: STOREFRONT_MARGIN,
-        y: this.logicalH / 2 - STOREFRONT_H / 2,
+        y: ANIM_H / 2 - STOREFRONT_H / 2,
         w: STOREFRONT_W,
         h: STOREFRONT_H,
       };
 
       this.channels = {
         x: this.logicalW - CHANNELS_MARGIN - CHANNELS_W,
-        y: this.logicalH / 2 - CHANNELS_H / 2,
+        y: ANIM_H / 2 - CHANNELS_H / 2,
         w: CHANNELS_W,
         h: CHANNELS_H,
       };
@@ -275,6 +276,82 @@
       this.drawTrolleyRing();
       this.drawHub();
       this.drawChannelDots();
+      this.drawLegend();
+    }
+
+    drawLegend() {
+      const ctx = this.ctx;
+      const dividerY = ANIM_H;
+      const cy = ANIM_H + (this.logicalH - ANIM_H) / 2;
+      const items = [
+        { type: "meteor-blue", label: "Tracking event" },
+        { type: "trolley-green", label: "Purchased" },
+        { type: "trolley-red", label: "Abandoned" },
+        { type: "meteor-red", label: "Recovery event" },
+      ];
+      const slotW = this.logicalW / items.length;
+      const sampleW = 30;
+
+      ctx.save();
+      ctx.strokeStyle = "#aaaaaa";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, dividerY);
+      ctx.lineTo(this.logicalW, dividerY);
+      ctx.stroke();
+
+      ctx.textBaseline = "middle";
+
+      items.forEach((item, i) => {
+        ctx.font = '600 11px "DM Mono", monospace';
+        ctx.textAlign = "left";
+        const labelW = ctx.measureText(item.label).width;
+        const slotCenterX = slotW * i + slotW / 2;
+        const totalW = sampleW + 10 + labelW;
+        const startX = slotCenterX - totalW / 2;
+        const sampleCx = startX + sampleW / 2;
+        const labelX = startX + sampleW + 10;
+
+        if (item.type === "meteor-blue" || item.type === "meteor-red") {
+          const rgb =
+            item.type === "meteor-blue" ? "92, 182, 224" : "193, 72, 72";
+          for (let j = 6; j >= 0; j--) {
+            const px = startX + sampleW - j * 4;
+            const fade = 1 - j / 7;
+            const radius = 4 * (0.4 + 0.6 * fade);
+            ctx.fillStyle = `rgba(${rgb}, ${fade * 0.95})`;
+            ctx.beginPath();
+            ctx.arc(px, cy, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (
+          item.type === "trolley-green" ||
+          item.type === "trolley-red"
+        ) {
+          const ringColor =
+            item.type === "trolley-green" ? COLOR_GREEN : COLOR_RED;
+          const tintColor =
+            item.type === "trolley-green" ? COLOR_GREEN_TINT : COLOR_RED_TINT;
+          ctx.beginPath();
+          ctx.arc(sampleCx, cy, 11, 0, Math.PI * 2);
+          ctx.fillStyle = tintColor;
+          ctx.fill();
+          ctx.strokeStyle = ringColor;
+          ctx.lineWidth = 1.75;
+          ctx.stroke();
+          ctx.font =
+            '11px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+          ctx.textAlign = "center";
+          ctx.fillText("🛒", sampleCx, cy);
+          ctx.font = '600 11px "DM Mono", monospace';
+          ctx.textAlign = "left";
+        }
+
+        ctx.fillStyle = COLORS.muted;
+        ctx.fillText(item.label, labelX, cy);
+      });
+
+      ctx.restore();
     }
 
     drawChannelDots() {
@@ -522,7 +599,7 @@
         if (age < 0 || age > 1) continue;
         const r = this.hubR + age * PULSE_RIPPLE_DISTANCE;
         const opacity = (1 - age) * 0.5;
-        ctx.strokeStyle = `rgba(61, 107, 150, ${opacity})`;
+        ctx.strokeStyle = `rgba(92, 182, 224, ${opacity})`;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(this.hubX, this.hubY, r, 0, Math.PI * 2);

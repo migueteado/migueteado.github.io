@@ -9,6 +9,11 @@
 @media (min-width: 640px) { .proj-breadcrumb { padding: 3rem 2rem 0; } }
 @media (min-width: 900px) { .proj-breadcrumb { padding: 3.5rem 2.5rem 0; } }
 
+/* When the breadcrumb precedes a single-column article, match its width */
+.proj-breadcrumb:has(+ .proj-article) {
+  max-width: 860px;
+}
+
 .proj-breadcrumb a {
   font-family: 'DM Mono', monospace;
   font-size: 0.72rem;
@@ -287,7 +292,7 @@
 }
 
 .proj-article-header {
-  margin-top: 4.25rem;
+  /* margin-top: 4.25rem; */
   margin-bottom: 2.25rem;
 }
 .proj-article-title {
@@ -365,6 +370,32 @@
   font-family: 'DM Mono', monospace;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.anim-hero-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+.anim-hero-footer .anim-btn--full {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.72rem;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.anim-hero-footer .anim-btn--full:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text);
+  border-color: transparent;
+  transform: none;
 }
 
 /* ── TECH STACK ── */

@@ -56,13 +56,13 @@
     </nav>
 
     <div class="page">
-      <article class="proj-article fade-up d1">
-        <nav class="proj-article-breadcrumb">
-          <a href="../projects.html">← Projects</a>
-          <span class="sep">/</span>
-          <span class="current">Pulse</span>
-        </nav>
+      <div class="proj-breadcrumb fade-up d1">
+        <a href="../projects.html">← Projects</a>
+        <span class="sep">/</span>
+        <span class="current">Pulse</span>
+      </div>
 
+      <article class="proj-article fade-up d2">
         <header class="proj-article-header">
           <h1 class="proj-article-title">Pulse</h1>
           <div class="proj-article-badges">
@@ -94,15 +94,17 @@
           <div class="anim-hero">
             <div class="anim-hero-header">
               <span class="anim-hero-label">Real-time cart tracking &amp; recovery flow</span>
-              <button class="btn-ghost anim-btn" id="anim-replay" type="button">↺ Replay</button>
             </div>
             <canvas
               class="anim-hero-canvas"
               id="anim-hero"
               width="720"
-              height="400"
+              height="440"
               aria-label="Pulse system animation: storefronts stream events into Pulse, which monitors carts for inactivity; when a cart is abandoned Pulse fires recovery campaigns through email, SMS, and push channels"
             ></canvas>
+            <div class="anim-hero-footer">
+              <button class="btn-ghost anim-btn anim-btn--full" id="anim-replay" type="button">↺ Replay</button>
+            </div>
           </div>
         </section>
 <div class="proj-section">
