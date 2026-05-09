@@ -1,862 +1,786 @@
-/* Resolve project page — hub-and-spoke ticket flow animation
- *
- * Layout:
- *           [REVIEWERS group: SUP1   SUP2]
- *                       ▲ ▼ (review / approve)
- *  [AGENTS]  ──→  [ R E S O L V E ]  ──→  [EXTERNAL SERVICES: ORDER, PAYMENT]
- *                                  ◀──   (responses)
- *
- * Flow:
- *  1. Agent → Resolve (ticket arrives)
- *  2. Resolve → Reviewer (Resolve dispatches for approval)
- *  3a. Rejected → ticket dismissed at reviewer
- *  3b. Approved → back to Resolve
- *  4. Resolve → external Service (Order or Payment)
- *  5. Service → Resolve (response packet returns; counter increments)
- */
+(function () {
+  const COLORS = {
+    surface: "#ffffff",
+    text: "#1c1c1a",
+    muted: "#7a7670",
+    softBorder: "#aaaaaa",
+    pulseRing: "#5cb6e0",
+    pulseSoft: "rgba(92, 182, 224, 0.16)",
+    pulseSofter: "rgba(92, 182, 224, 0.10)",
+    pulseTint: "#eaf6fb",
+  };
 
-const DURATION       = 16000;
-const SPAWN_END      = 13500;
-const REVIEW_MS      = 1300;
-const REVIEWED_MS    = 450;   // brief display of check/X after review
-const TRAVEL_FAST    = 0.0019;
-const TRAVEL_NORMAL  = 0.0014;
-const RESPONSE_DELAY = 220;
-const REJECT_RATE    = 0.18;
-const SPAWN_MIN      = 2400;
-const SPAWN_MAX      = 3800;
+  const ANIM_H = 400;
+  const HUB_RADIUS = 50;
+  const BOX_W = 80;
+  const BOX_MARGIN = 30;
+  const ICON_SIZE = 30;
 
-const TICKET_TYPES = [
-  { id: 'reship', label: 'RESHIP', color: '#2d6a50', service: 0 },
-  { id: 'refund', label: 'REFUND', color: '#3d6b96', service: 1 },
-  { id: 'cancel', label: 'CANCEL', color: '#9a6240', service: 0 },
-];
+  const FLOW_DOT_RADIUS = 4;
+  const FLOW_TRAIL_STEPS = 7;
+  const FLOW_TRAIL_GAP = 0.045;
+  const PULSE_RIPPLE_DURATION = 700;
+  const PULSE_RIPPLE_DISTANCE = 24;
+  const LABEL_DURATION = 1200;
 
-class ResolveHero {
-  constructor(canvas, counterEl) {
-    this.canvas    = canvas;
-    this.ctx       = canvas.getContext('2d');
-    this.counterEl = counterEl;
-    this.tickets   = [];
-    this.nextId    = 0;
-    this.resolved  = 0;
-    this.elapsed   = 0;
-    this.lastTs    = null;
-    this.rafId     = null;
-    this.resolvePulseT = 0;
-    this.setupHiDPI();
-    this.layout();
-    this.bindReplay();
-    this.autoPlay();
-  }
+  const TICKET_GEN_MS = 1500;
+  const TICKET_TRAVEL_TO_SUP_MS = 800;
+  const TICKET_REVIEW_MS = 1100;
+  const TICKET_TRAVEL_BACK_MS = 700;
+  const TICKET_TRAVEL_TO_MS_MS = 700;
+  const TICKET_PROCESS_MS = 1500;
+  const TICKET_FADE_MS = 600;
+  const REJECT_RATE = 0.18;
+  const TICKET_INTERVAL = 3500;
 
-  setupHiDPI() {
-    const dpr = window.devicePixelRatio || 1;
-    const lW  = this.canvas.width;
-    const lH  = this.canvas.height;
-    this.canvas.width  = lW * dpr;
-    this.canvas.height = lH * dpr;
-    this.W = lW;
-    this.H = lH;
-    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
+  const T_GEN = TICKET_GEN_MS;
+  const T_SUP = T_GEN + TICKET_TRAVEL_TO_SUP_MS;
+  const T_REVIEW = T_SUP + TICKET_REVIEW_MS;
+  const T_REJ_END = T_REVIEW + TICKET_FADE_MS;
+  const T_BACK = T_REVIEW + TICKET_TRAVEL_BACK_MS;
+  const T_TO_MS = T_BACK + TICKET_TRAVEL_TO_MS_MS;
+  const T_PROCESS_END = T_TO_MS + TICKET_PROCESS_MS;
 
-  layout() {
-    // Canvas: 720×380, Resolve canvas-centered at (360, 190)
-
-    // ── Top label ──────────────────────────────────────────
-    this.topLabelY = 20;
-
-    // ── REVIEWERS (top center, 2 supervisors) ──────────────
-    this.reviewerR = 22;
-    this.reviewers = [
-      { x: 325, y: 58, busy: false, ticketId: null, progress: 0 },
-      { x: 395, y: 58, busy: false, ticketId: null, progress: 0 },
-    ];
-
-    // ── Three boxes share the same vertical band ───────────
-    // Agent and External boxes mirror each other around Resolve.
-    const boxTop = 100, boxBottom = 280; // H = 180
-
-    // ── AGENT GROUP (left, dashed boundary, 4 agents) ──────
-    this.agentLeft   = 60;
-    this.agentRight  = 240;     // W = 180
-    this.agentTop    = boxTop;
-    this.agentBottom = boxBottom;
-    this.agentR = 18;
-    this.agents = [130, 170, 210, 250].map((y, i) => ({
-      x: 150,                   // centered in agent box
-      y,
-      lastSpawn: -Math.random() * 1800 - i * 350,
-      spawnInterval: SPAWN_MIN + Math.random() * (SPAWN_MAX - SPAWN_MIN),
-      flashT: 0,
-    }));
-
-    // ── RESOLVE box (canvas-centered hub) ──────────────────
-    this.resolveX      = 360;
-    this.resolveY      = 190;
-    this.resolveW      = 160;
-    this.resolveH      = 180;
-    this.resolveLeft   = this.resolveX - this.resolveW / 2;  // 280
-    this.resolveRight  = this.resolveX + this.resolveW / 2;  // 440
-    this.resolveTop    = this.resolveY - this.resolveH / 2;  // 100
-    this.resolveBottom = this.resolveY + this.resolveH / 2;  // 280
-
-    // ── EXTERNAL SERVICES (right, dashed boundary) ─────────
-    this.externalLeft   = 480;
-    this.externalRight  = 660;  // W = 180
-    this.externalTop    = boxTop;
-    this.externalBottom = boxBottom;
-    this.serviceR = 22;
-    this.services = [
-      { x: 570, y: 150, id: 'order',   label: 'ORDER',   color: '#2d6a50', pulseT: 0 },
-      { x: 570, y: 230, id: 'payment', label: 'PAYMENT', color: '#3d6b96', pulseT: 0 },
-    ];
-
-    // ── Ticket sizing ──────────────────────────────────────
-    this.tickW = 42;
-    this.tickH = 20;
-  }
-
-  autoPlay() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      this.draw(); return;
-    }
-    const obs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) { this.start(); obs.disconnect(); }
-    }, { threshold: 0.3 });
-    obs.observe(this.canvas);
-  }
-
-  bindReplay() {
-    document.getElementById('anim-replay')?.addEventListener('click', () => this.start());
-  }
-
-  start() {
-    if (this.rafId) cancelAnimationFrame(this.rafId);
-    this.tickets   = [];
-    this.nextId    = 0;
-    this.resolved  = 0;
-    this.elapsed   = 0;
-    this.lastTs    = null;
-    this.resolvePulseT = 0;
-    this.agents.forEach((a, i) => {
-      a.lastSpawn = -Math.random() * 1800 - i * 350;
-      a.spawnInterval = SPAWN_MIN + Math.random() * (SPAWN_MAX - SPAWN_MIN);
-      a.flashT = 0;
-    });
-    this.reviewers.forEach(r => { r.busy = false; r.ticketId = null; r.progress = 0; });
-    this.services.forEach(s => s.pulseT = 0);
-    if (this.counterEl) this.counterEl.textContent = '0';
-    this.rafId = requestAnimationFrame(ts => this.loop(ts));
-  }
-
-  loop(ts) {
-    if (!this.lastTs) this.lastTs = ts;
-    const dt = Math.min(ts - this.lastTs, 50);
-    this.lastTs = ts;
-    this.elapsed += dt;
-    this.update(dt);
-    this.draw();
-    if (this.elapsed < DURATION || this.tickets.length > 0) {
-      this.rafId = requestAnimationFrame(t => this.loop(t));
-    }
-  }
-
-  // ── UPDATE ─────────────────────────────────────────────────────────────────
-
-  update(dt) {
-    // Decay agent flashes
-    for (const a of this.agents) {
-      if (a.flashT > 0) a.flashT = Math.max(0, a.flashT - dt * 0.0035);
-    }
-    // Decay Resolve pulse
-    if (this.resolvePulseT > 0) {
-      this.resolvePulseT = Math.max(0, this.resolvePulseT - dt * 0.0024);
-    }
-    // Decay service pulses
-    for (const s of this.services) {
-      if (s.pulseT > 0) s.pulseT = Math.max(0, s.pulseT - dt * 0.0018);
+  class ResolveHero {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d");
+      this.running = false;
+      this.rafId = null;
+      this.setupHiDPI();
+      this.layout();
+      this.reset();
     }
 
-    // 1. Agents spawn tickets in parallel
-    if (this.elapsed < SPAWN_END) {
-      for (const agent of this.agents) {
-        if (this.elapsed - agent.lastSpawn >= agent.spawnInterval) {
-          agent.lastSpawn = this.elapsed;
-          agent.spawnInterval = SPAWN_MIN + Math.random() * (SPAWN_MAX - SPAWN_MIN);
-          agent.flashT = 1;
-          const type = TICKET_TYPES[Math.floor(Math.random() * 3)];
-          const approved = Math.random() > REJECT_RATE;
-          this.tickets.push({
-            id: this.nextId++,
-            type,
-            approved,
-            phase: 'agent-to-resolve',
-            t: 0,
-            opacity: 0,
-            srcX: agent.x,
-            srcY: agent.y,
-            reviewerIdx: null,
-            responseDelay: 0,
+    reset() {
+      if (this.rafId) cancelAnimationFrame(this.rafId);
+      this.running = false;
+      this.elapsed = 0;
+      this.startTime = 0;
+      this.impulses = [];
+      this.approvedLabels = [];
+      this.rejectedLabels = [];
+      this.processedLabels = [];
+      this.tickets = [];
+      if (this.flows) {
+        for (const f of this.flows) {
+          f.dots = [];
+          f.nextSpawnAt = 0;
+        }
+      }
+      this.draw();
+    }
+
+    start() {
+      this.reset();
+      this.running = true;
+      this.startTime = performance.now();
+      const tick = (now) => {
+        if (!this.running) return;
+        this.elapsed = Math.max(0, now - this.startTime);
+        this.update();
+        this.draw();
+        this.rafId = requestAnimationFrame(tick);
+      };
+      this.rafId = requestAnimationFrame(tick);
+    }
+
+    update() {
+      for (const f of this.flows) {
+        if (!f.manual) {
+          while (this.elapsed >= f.nextSpawnAt) {
+            this.spawnDot(f, f.nextSpawnAt);
+            f.nextSpawnAt += f.spawnInterval;
+          }
+        }
+
+        const stillAlive = [];
+        for (const d of f.dots) {
+          if (this.elapsed - d.startTime < d.duration) {
+            stillAlive.push(d);
+          } else if (f.id === "agent-request") {
+            this.impulses.push(d.startTime + d.duration);
+            this.spawnTicket(d.startTime + d.duration);
+          }
+        }
+        f.dots = stillAlive;
+      }
+
+      const aliveTickets = [];
+      for (const tk of this.tickets) {
+        const t = this.elapsed - tk.spawnTime;
+        const totalDuration =
+          tk.outcome === "rejected" ? T_REJ_END : T_PROCESS_END;
+        if (t < totalDuration) {
+          aliveTickets.push(tk);
+        } else if (tk.outcome === "approved") {
+          this.processedLabels.push({
+            time: tk.spawnTime + T_PROCESS_END,
+            x: tk.msTargetX,
+            y: tk.msTargetY,
           });
         }
       }
+      this.tickets = aliveTickets;
+
+      this.impulses = this.impulses.filter(
+        (t) => this.elapsed - t < PULSE_RIPPLE_DURATION,
+      );
+      this.approvedLabels = this.approvedLabels.filter(
+        (h) => this.elapsed - h.time < LABEL_DURATION,
+      );
+      this.rejectedLabels = this.rejectedLabels.filter(
+        (h) => this.elapsed - h.time < LABEL_DURATION,
+      );
+      this.processedLabels = this.processedLabels.filter(
+        (h) => this.elapsed - h.time < LABEL_DURATION,
+      );
     }
 
-    // 2. Update each ticket based on phase
-    const toRemove = [];
-    for (const tk of this.tickets) {
-      switch (tk.phase) {
-        case 'agent-to-resolve':
-          tk.t += dt * TRAVEL_NORMAL;
-          tk.opacity = Math.min(1, tk.t * 5) * (1 - Math.max(0, (tk.t - 0.72) / 0.28));
-          if (tk.t >= 1) {
-            this.resolvePulseT = Math.max(this.resolvePulseT, 0.7);
-            tk.t = 0;
-            tk.phase = 'await-reviewer';
-          }
-          break;
-
-        case 'await-reviewer':
-          // Held inside Resolve; assignment happens in queue pass below
-          break;
-
-        case 'resolve-to-reviewer':
-          tk.t += dt * TRAVEL_FAST;
-          tk.opacity = Math.min(1, tk.t * 4);
-          if (tk.t >= 1) { tk.t = 0; tk.opacity = 1; tk.phase = 'reviewing'; }
-          break;
-
-        case 'reviewing': {
-          tk.t += dt / REVIEW_MS;
-          const r = this.reviewers[tk.reviewerIdx];
-          r.progress = tk.t;
-          if (tk.t >= 1) {
-            tk.t = 0;
-            tk.phase = 'reviewed';
-          }
-          break;
+    spawnDot(f, startTime) {
+      if (f.style === "linear") {
+        f.dots.push({ startTime, duration: f.travel });
+      } else if (f.style === "event") {
+        let ox, oy, tx, ty;
+        if (f.spawnPattern === "from-box-to-scope") {
+          const src =
+            f.sourceBox.iconPositions[
+              Math.floor(Math.random() * f.sourceBox.iconPositions.length)
+            ];
+          ox = src.cx;
+          oy = src.cy;
+          const dx = this.scopeX - ox;
+          const dy = this.scopeY - oy;
+          const dist = Math.hypot(dx, dy) || 1;
+          tx = this.scopeX - (dx / dist) * this.scopeR;
+          ty = this.scopeY - (dy / dist) * this.scopeR;
         }
-
-        case 'reviewed': {
-          tk.t += dt / REVIEWED_MS;
-          if (tk.t >= 1) {
-            const r = this.reviewers[tk.reviewerIdx];
-            r.busy = false;
-            r.ticketId = null;
-            r.progress = 0;
-            tk.t = 0;
-            tk.phase = tk.approved ? 'reviewer-to-resolve' : 'rejected';
-          }
-          break;
-        }
-
-        case 'rejected':
-          tk.t += dt * 0.0024;
-          tk.opacity = 1 - tk.t;
-          if (tk.t >= 1) toRemove.push(tk.id);
-          break;
-
-        case 'reviewer-to-resolve':
-          tk.t += dt * TRAVEL_FAST;
-          tk.opacity = 1 - Math.max(0, (tk.t - 0.7) / 0.3);
-          if (tk.t >= 1) {
-            this.resolvePulseT = Math.max(this.resolvePulseT, 0.8);
-            tk.t = 0;
-            tk.phase = 'resolve-to-service';
-          }
-          break;
-
-        case 'resolve-to-service':
-          tk.t += dt * TRAVEL_NORMAL;
-          tk.opacity = Math.min(1, tk.t * 5) * (1 - Math.max(0, (tk.t - 0.78) / 0.22));
-          if (tk.t >= 1) {
-            this.services[tk.type.service].pulseT = 1;
-            tk.t = 0;
-            tk.opacity = 1;
-            tk.phase = 'service-response';
-            tk.responseDelay = RESPONSE_DELAY;
-          }
-          break;
-
-        case 'service-response':
-          if (tk.responseDelay > 0) {
-            tk.responseDelay -= dt;
-            tk.opacity = 0;
-            break;
-          }
-          tk.t += dt * TRAVEL_NORMAL;
-          tk.opacity = Math.min(1, tk.t * 5) * (1 - Math.max(0, (tk.t - 0.8) / 0.2));
-          if (tk.t >= 1) {
-            this.resolvePulseT = Math.max(this.resolvePulseT, 1);
-            this.resolved++;
-            if (this.counterEl) this.counterEl.textContent = this.resolved.toString();
-            toRemove.push(tk.id);
-          }
-          break;
+        f.dots.push({ startTime, duration: f.travel, ox, oy, tx, ty });
       }
     }
 
-    // 3. FIFO assign awaiting tickets to free reviewers
-    const awaiting = this.tickets
-      .filter(t => t.phase === 'await-reviewer')
-      .sort((a, b) => a.id - b.id);
-    for (const tk of awaiting) {
-      const freeIdx = this.reviewers.findIndex(r => !r.busy);
-      if (freeIdx < 0) break;
-      tk.reviewerIdx = freeIdx;
-      this.reviewers[freeIdx].busy = true;
-      this.reviewers[freeIdx].ticketId = tk.id;
-      this.reviewers[freeIdx].progress = 0;
-      tk.phase = 'resolve-to-reviewer';
-      tk.t = 0;
+    spawnTicket(startTime) {
+      const supervisorIcon =
+        this.supervisors.iconPositions[
+          Math.floor(Math.random() * this.supervisors.iconPositions.length)
+        ];
+      const microserviceIcon =
+        this.microservices.iconPositions[
+          Math.floor(Math.random() * this.microservices.iconPositions.length)
+        ];
+      const outcome = Math.random() < REJECT_RATE ? "rejected" : "approved";
+      this.tickets.push({
+        spawnTime: startTime,
+        outcome,
+        supTargetX: supervisorIcon.cx,
+        supTargetY: supervisorIcon.cy,
+        msTargetX: microserviceIcon.cx,
+        msTargetY: microserviceIcon.cy,
+      });
+      const verdictTime = startTime + T_REVIEW;
+      if (outcome === "approved") {
+        this.approvedLabels.push({
+          time: verdictTime,
+          x: supervisorIcon.cx,
+          y: supervisorIcon.cy,
+        });
+      } else {
+        this.rejectedLabels.push({
+          time: verdictTime,
+          x: supervisorIcon.cx,
+          y: supervisorIcon.cy,
+        });
+      }
     }
 
-    // 4. Remove finished
-    if (toRemove.length) {
-      this.tickets = this.tickets.filter(t => !toRemove.includes(t.id));
-    }
-  }
-
-  // ── DRAW ───────────────────────────────────────────────────────────────────
-
-  draw() {
-    const { ctx, W, H } = this;
-    ctx.clearRect(0, 0, W, H);
-    this.drawConnectors();
-    this.drawTopLabel();
-    this.drawGroupBoundary(this.agentLeft, this.agentTop, this.agentRight - this.agentLeft, this.agentBottom - this.agentTop, 'CS AGENTS');
-    this.drawGroupBoundary(this.externalLeft, this.externalTop, this.externalRight - this.externalLeft, this.externalBottom - this.externalTop, 'EXTERNAL');
-    this.drawAgents();
-    this.drawReviewers();
-    this.drawServices();
-    this.drawResolveBox();
-    this.drawTickets();
-  }
-
-  drawConnectors() {
-    const { ctx } = this;
-    const border = cssVar('--border', '#e0dbd3');
-    ctx.save();
-    ctx.strokeStyle = border;
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3, 5]);
-    ctx.globalAlpha = 0.4;
-
-    // Agents → Resolve (left edge anchor)
-    for (const a of this.agents) {
-      ctx.beginPath();
-      ctx.moveTo(a.x + this.agentR + 1, a.y);
-      ctx.lineTo(this.resolveLeft - 2, this.resolveY);
-      ctx.stroke();
+    setupHiDPI() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      this.logicalW = w;
+      this.logicalH = h;
+      this.canvas.width = w * dpr;
+      this.canvas.height = h * dpr;
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    // Resolve ↔ Reviewers (diagonals converging on Resolve top center)
-    for (const r of this.reviewers) {
-      ctx.beginPath();
-      ctx.moveTo(r.x, r.y + this.reviewerR + 2);
-      ctx.lineTo(this.resolveX, this.resolveTop - 2);
-      ctx.stroke();
-    }
+    layout() {
+      this.scopeX = this.logicalW / 2;
+      this.scopeY = ANIM_H / 2;
+      this.scopeR = HUB_RADIUS;
 
-    // Resolve → Services (bidirectional)
-    for (const s of this.services) {
-      ctx.beginPath();
-      ctx.moveTo(this.resolveRight + 2, this.resolveY);
-      ctx.lineTo(s.x - this.serviceR - 2, s.y);
-      ctx.stroke();
-    }
+      const totalH = 340;
+      const yTop = ANIM_H / 2 - totalH / 2;
+      const rightX = this.logicalW - BOX_MARGIN - BOX_W;
+      const microservicesW = 240;
+      const microservicesH = 80;
+      const microservicesX = this.scopeX - microservicesW / 2;
 
-    ctx.restore();
-  }
+      this.agents = {
+        id: "agents",
+        label: "cs agents",
+        labelSide: "left",
+        x: BOX_MARGIN,
+        y: yTop,
+        w: BOX_W,
+        h: totalH,
+        icons: ["💁", "💁", "💁"],
+      };
 
-  drawTopLabel() {
-    const { ctx, topLabelY } = this;
-    const muted = cssVar('--muted', '#7a7670');
-    ctx.save();
-    ctx.font = '500 9px "DM Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = muted;
-    ctx.fillText('CS SUPERVISORS · REVIEWERS', (this.reviewers[0].x + this.reviewers[1].x) / 2, topLabelY);
-    ctx.restore();
-  }
+      this.supervisors = {
+        id: "supervisors",
+        label: "cs supervisors",
+        labelSide: "right",
+        x: rightX,
+        y: yTop,
+        w: BOX_W,
+        h: totalH,
+        icons: ["🧐", "🧐", "🧐"],
+      };
 
-  drawGroupBoundary(x, y, w, h, label) {
-    const { ctx } = this;
-    const muted = cssVar('--muted', '#7a7670');
-    const border = cssVar('--border', '#e0dbd3');
-    ctx.save();
+      this.microservices = {
+        id: "microservices",
+        label: "microservices",
+        labelSide: "top",
+        x: microservicesX,
+        y: yTop,
+        w: microservicesW,
+        h: microservicesH,
+        iconLayout: "horizontal",
+        icons: ["📦", "💳", "🚚"],
+      };
 
-    // Dashed boundary
-    roundRect(ctx, x, y, w, h, 10);
-    ctx.setLineDash([5, 4]);
-    ctx.strokeStyle = border;
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-    ctx.setLineDash([]);
+      this.boxes = [this.agents, this.supervisors, this.microservices];
 
-    // Tag breaking through the top border
-    const tagX = x + 12;
-    const tagY = y;
-    ctx.font = 'bold 8px "DM Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    const tagW = ctx.measureText(label).width + 12;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(tagX - 4, tagY - 7, tagW, 12);
-    ctx.fillStyle = muted;
-    ctx.fillText(label, tagX + 2, tagY);
-
-    ctx.restore();
-  }
-
-  drawAgents() {
-    const { ctx } = this;
-    const accent = cssVar('--accent', '#2d6a50');
-    const border = cssVar('--border', '#e0dbd3');
-
-    for (const a of this.agents) {
-      ctx.save();
-      if (a.flashT > 0) {
-        ctx.beginPath();
-        ctx.arc(a.x, a.y, this.agentR + 4 + (1 - a.flashT) * 7, 0, Math.PI * 2);
-        ctx.strokeStyle = accent;
-        ctx.lineWidth = 1.5;
-        ctx.globalAlpha = a.flashT * 0.45;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
+      for (const box of this.boxes) {
+        const n = box.icons.length;
+        if (box.iconLayout === "horizontal") {
+          const gap = (box.w - n * ICON_SIZE) / (n + 1);
+          const cy = box.y + box.h / 2;
+          const firstCx = box.x + gap + ICON_SIZE / 2;
+          box.iconPositions = box.icons.map((iconDef, i) => {
+            const glyph =
+              typeof iconDef === "string" ? iconDef : iconDef.glyph;
+            const color =
+              typeof iconDef === "string" ? null : iconDef.color;
+            return {
+              glyph,
+              color,
+              cx: firstCx + i * (ICON_SIZE + gap),
+              cy,
+            };
+          });
+        } else {
+          const gap = (box.h - n * ICON_SIZE) / (n + 1);
+          const cx = box.x + box.w / 2;
+          const firstCy = box.y + gap + ICON_SIZE / 2;
+          box.iconPositions = box.icons.map((iconDef, i) => {
+            const glyph =
+              typeof iconDef === "string" ? iconDef : iconDef.glyph;
+            const color =
+              typeof iconDef === "string" ? null : iconDef.color;
+            return {
+              glyph,
+              color,
+              cx,
+              cy: firstCy + i * (ICON_SIZE + gap),
+            };
+          });
+        }
       }
 
-      ctx.beginPath();
-      ctx.arc(a.x, a.y, this.agentR, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = border;
-      ctx.lineWidth = 1.3;
-      ctx.fill();
-      ctx.stroke();
+      this.docHomeX = this.scopeX;
+      this.docHomeY = this.scopeY + this.scopeR + 60;
 
-      // Person + headset
-      ctx.fillStyle = accent;
-      ctx.beginPath();
-      ctx.arc(a.x, a.y - 4, 4.8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(a.x, a.y + 11, 8.5, Math.PI, 0);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(a.x, a.y - 4, 7.5, Math.PI, 0);
-      ctx.strokeStyle = accent;
-      ctx.lineWidth = 1.5;
-      ctx.lineCap = 'round';
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(a.x - 7.5, a.y - 4, 1.7, 0, Math.PI * 2);
-      ctx.arc(a.x + 7.5, a.y - 4, 1.7, 0, Math.PI * 2);
-      ctx.fillStyle = accent;
-      ctx.fill();
+      this.flows = [];
 
-      ctx.restore();
+      for (let i = 0; i < this.microservices.iconPositions.length; i++) {
+        const ip = this.microservices.iconPositions[i];
+        this.flows.push({
+          id: `microservice-${i}-poll`,
+          fromX: ip.cx,
+          fromY: this.microservices.y + this.microservices.h,
+          waypoints: [{ x: ip.cx, y: this.scopeY - this.scopeR }],
+          toX: this.scopeX,
+          toY: this.scopeY - this.scopeR,
+          rgb: "240, 200, 90",
+          style: "linear",
+          spawnInterval: 900 + i * 120,
+          travel: 1500,
+          dots: [],
+          nextSpawnAt: 0,
+        });
+      }
+
+      this.flows.push({
+        id: "agent-request",
+        sourceBox: this.agents,
+        spawnPattern: "from-box-to-scope",
+        rgb: "92, 182, 224",
+        style: "event",
+        spawnInterval: TICKET_INTERVAL,
+        travel: 800,
+        dots: [],
+        nextSpawnAt: 0,
+      });
+
+      for (const f of this.flows) {
+        if (f.style !== "linear") continue;
+        const pts = [{ x: f.fromX, y: f.fromY }];
+        if (f.waypoints) for (const wp of f.waypoints) pts.push(wp);
+        pts.push({ x: f.toX, y: f.toY });
+        f.path = pts;
+        f.segments = [];
+        let total = 0;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const dx = pts[i + 1].x - pts[i].x;
+          const dy = pts[i + 1].y - pts[i].y;
+          const len = Math.hypot(dx, dy);
+          f.segments.push({
+            from: pts[i],
+            to: pts[i + 1],
+            len,
+            accStart: total,
+          });
+          total += len;
+        }
+        f.totalLen = total;
+      }
     }
-  }
 
-  drawReviewers() {
-    const { ctx, reviewerR } = this;
-    const accent = cssVar('--accent', '#2d6a50');
-    const border = cssVar('--border', '#e0dbd3');
+    draw() {
+      const ctx = this.ctx;
+      ctx.clearRect(0, 0, this.logicalW, this.logicalH);
+      this.drawFlowLines();
+      for (const box of this.boxes) this.drawBox(box);
+      this.drawHub();
+      this.drawTickets();
+      this.drawFlowDots();
+      this.drawApprovedLabels();
+      this.drawRejectedLabels();
+      this.drawProcessedLabels();
+      this.drawLegend();
+    }
 
-    for (const r of this.reviewers) {
+    drawFlowLines() {
+      const ctx = this.ctx;
       ctx.save();
-
-      // Outer dashed ring
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, reviewerR + 7, 0, Math.PI * 2);
-      ctx.strokeStyle = border;
+      ctx.strokeStyle = COLORS.softBorder;
       ctx.lineWidth = 1;
-      ctx.setLineDash([3, 5]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Body
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, reviewerR, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = border;
-      ctx.lineWidth = 1.5;
-      ctx.fill();
-      ctx.stroke();
-
-      // Shield + check
-      const sy = r.y - 1;
-      ctx.beginPath();
-      ctx.moveTo(r.x, sy - 11);
-      ctx.lineTo(r.x + 9, sy - 7);
-      ctx.lineTo(r.x + 9, sy + 1);
-      ctx.quadraticCurveTo(r.x + 9, sy + 8, r.x, sy + 13);
-      ctx.quadraticCurveTo(r.x - 9, sy + 8, r.x - 9, sy + 1);
-      ctx.lineTo(r.x - 9, sy - 7);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(45,106,80,0.10)';
-      ctx.fill();
-      ctx.strokeStyle = accent;
-      ctx.lineWidth = 1.3;
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(r.x - 4, sy + 1);
-      ctx.lineTo(r.x - 1, sy + 4);
-      ctx.lineTo(r.x + 5, sy - 4);
-      ctx.strokeStyle = accent;
-      ctx.lineWidth = 1.8;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.stroke();
-
+      ctx.setLineDash([3, 4]);
+      for (const f of this.flows) {
+        if (f.style !== "linear") continue;
+        ctx.beginPath();
+        ctx.moveTo(f.path[0].x, f.path[0].y);
+        for (let i = 1; i < f.path.length; i++) {
+          ctx.lineTo(f.path[i].x, f.path[i].y);
+        }
+        ctx.stroke();
+      }
       ctx.restore();
     }
-  }
 
-  drawResolveBox() {
-    const { ctx, resolveX, resolveY, resolveW, resolveH, resolveLeft, resolveTop, resolveBottom } = this;
-    const accent = cssVar('--accent', '#2d6a50');
-    const border = cssVar('--border', '#e0dbd3');
-    const text   = cssVar('--text', '#1c1c1a');
-    const muted  = cssVar('--muted', '#7a7670');
-    ctx.save();
-
-    // Pulse glow
-    if (this.resolvePulseT > 0) {
-      const pad = (1 - this.resolvePulseT) * 14 + 4;
-      roundRect(ctx, resolveLeft - pad, resolveTop - pad, resolveW + pad * 2, resolveH + pad * 2, 14);
-      ctx.strokeStyle = accent;
-      ctx.lineWidth = 1.5;
-      ctx.globalAlpha = this.resolvePulseT * 0.4;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-
-    // Body
-    roundRect(ctx, resolveLeft, resolveTop, resolveW, resolveH, 10);
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = this.resolvePulseT > 0.05 ? accent : border;
-    ctx.lineWidth = 1.8;
-    ctx.fill();
-    ctx.stroke();
-
-    // Header bar inside box
-    ctx.save();
-    roundRect(ctx, resolveLeft, resolveTop, resolveW, 26, { tl: 10, tr: 10, br: 0, bl: 0 });
-    ctx.fillStyle = 'rgba(45,106,80,0.07)';
-    ctx.fill();
-    ctx.restore();
-
-    // Header text
-    ctx.font = '600 7.5px "DM Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = accent;
-    ctx.fillText('● SYSTEM', resolveLeft + 11, resolveTop + 13);
-
-    // Title (positioned near box vertical center)
-    ctx.font = '800 22px "Inter", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = text;
-    ctx.fillText('Resolve', resolveX, resolveTop + 75);
-
-    // Subtitle
-    ctx.font = '500 7.5px "DM Mono", monospace';
-    ctx.fillStyle = muted;
-    ctx.fillText('ORCHESTRATOR', resolveX, resolveTop + 92);
-
-    // Divider
-    ctx.beginPath();
-    ctx.moveTo(resolveLeft + 16, resolveTop + 105);
-    ctx.lineTo(resolveLeft + resolveW - 16, resolveTop + 105);
-    ctx.strokeStyle = border;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Queue chips (awaiting reviewer) near bottom
-    const awaiting = this.tickets.filter(t => t.phase === 'await-reviewer');
-    const chipY = resolveBottom - 28;
-    const maxChips = 9;
-    const chipSpacing = 10;
-    const showChips = Math.min(awaiting.length, maxChips);
-    if (showChips > 0) {
-      const totalW = (showChips - 1) * chipSpacing;
-      const startX = resolveX - totalW / 2;
-      for (let i = 0; i < showChips; i++) {
-        const tk = awaiting[i];
-        ctx.beginPath();
-        ctx.arc(startX + i * chipSpacing, chipY, 3.2, 0, Math.PI * 2);
-        ctx.fillStyle = tk.type.color;
-        ctx.fill();
-      }
-    }
-    // Queue label
-    ctx.font = '500 7px "DM Mono", monospace';
-    ctx.fillStyle = muted;
-    ctx.textAlign = 'center';
-    ctx.fillText(awaiting.length > 0 ? `QUEUE · ${awaiting.length}` : 'IDLE', resolveX, chipY + 13);
-
-    ctx.restore();
-  }
-
-  drawServices() {
-    const { ctx, serviceR } = this;
-    const border = cssVar('--border', '#e0dbd3');
-
-    for (const s of this.services) {
+    drawFlowDots() {
+      const ctx = this.ctx;
       ctx.save();
-      const w = serviceR * 2.0, h = serviceR * 1.7;
+      for (const f of this.flows) {
+        for (const d of f.dots) {
+          const local = this.elapsed - d.startTime;
+          const t = Math.max(0, Math.min(1, local / d.duration));
 
-      // Pulse ring
-      if (s.pulseT > 0) {
-        const pad = (1 - s.pulseT) * 9 + 2;
-        roundRect(ctx, s.x - w/2 - pad, s.y - h/2 - pad, w + pad * 2, h + pad * 2, 9);
-        ctx.strokeStyle = s.color;
-        ctx.lineWidth = 1.5;
-        ctx.globalAlpha = s.pulseT * 0.5;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
+          if (f.style === "linear") {
+            const target = t * f.totalLen;
+            let x = f.path[f.path.length - 1].x;
+            let y = f.path[f.path.length - 1].y;
+            for (const seg of f.segments) {
+              if (seg.accStart + seg.len >= target) {
+                const localT =
+                  seg.len === 0 ? 0 : (target - seg.accStart) / seg.len;
+                x = seg.from.x + (seg.to.x - seg.from.x) * localT;
+                y = seg.from.y + (seg.to.y - seg.from.y) * localT;
+                break;
+              }
+            }
+            ctx.fillStyle = `rgba(${f.rgb}, 1)`;
+            ctx.beginPath();
+            ctx.arc(x, y, FLOW_DOT_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (f.style === "event") {
+            for (let i = FLOW_TRAIL_STEPS; i >= 0; i--) {
+              const tt = t - i * FLOW_TRAIL_GAP;
+              if (tt < 0) continue;
+              const x = d.ox + (d.tx - d.ox) * tt;
+              const y = d.oy + (d.ty - d.oy) * tt;
+              const fade = 1 - i / (FLOW_TRAIL_STEPS + 1);
+              const radius = FLOW_DOT_RADIUS * (0.4 + 0.6 * fade);
+              ctx.fillStyle = `rgba(${f.rgb}, ${fade * 0.95})`;
+              ctx.beginPath();
+              ctx.arc(x, y, radius, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
       }
-
-      // Body
-      roundRect(ctx, s.x - w/2, s.y - h/2, w, h, 7);
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = s.pulseT > 0.1 ? s.color : border;
-      ctx.lineWidth = 1.6;
-      ctx.fill();
-      ctx.stroke();
-
-      // Icon
-      ctx.strokeStyle = s.color;
-      ctx.fillStyle   = s.color;
-      ctx.lineWidth   = 1.5;
-      ctx.lineCap     = 'round';
-      ctx.lineJoin    = 'round';
-
-      if (s.id === 'order') {
-        // Box with cross-tape
-        ctx.beginPath();
-        roundRect(ctx, s.x - 11, s.y - 8, 22, 14, 1.5);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(s.x - 11, s.y - 1);
-        ctx.lineTo(s.x + 11, s.y - 1);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(s.x, s.y - 8);
-        ctx.lineTo(s.x, s.y + 5);
-        ctx.stroke();
-      } else {
-        // Card with chip + stripe
-        ctx.beginPath();
-        roundRect(ctx, s.x - 12, s.y - 8, 24, 15, 2);
-        ctx.stroke();
-        ctx.fillRect(s.x - 12, s.y - 5, 24, 2.5);
-        ctx.beginPath();
-        ctx.rect(s.x - 9, s.y + 1, 5, 4);
-        ctx.stroke();
-      }
-
-      // Label below icon (inside box)
-      ctx.font = 'bold 8px "DM Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'alphabetic';
-      ctx.fillStyle = s.color;
-      ctx.fillText(s.label, s.x, s.y + h/2 + 14);
-
       ctx.restore();
     }
-  }
 
-  // ── Tickets ────────────────────────────────────────────────────────────────
+    drawBox(box) {
+      const ctx = this.ctx;
+      const { x, y, w, h } = box;
 
-  drawTickets() {
-    for (const tk of this.tickets) {
-      if (tk.phase === 'await-reviewer') continue; // rendered as chips inside Resolve
-      const pos = this.getTicketPos(tk);
-      if (!pos) continue;
-      const compact = (tk.phase === 'service-response');
-      this.drawTicket(pos.x, pos.y, tk, compact);
+      ctx.save();
+      ctx.strokeStyle = COLORS.softBorder;
+      ctx.lineWidth = 1.25;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(x, y, w, h);
+      ctx.restore();
 
-      // Decision badge stamps onto the ticket during reviewed/rejected phases
-      if (tk.phase === 'reviewed') {
-        // Pop-in scale during the first ~25% of the phase
-        const scale = Math.min(1, tk.t * 4);
-        this.drawDecisionBadge(pos.x, pos.y, tk.approved, scale, tk.opacity ?? 1);
-      } else if (tk.phase === 'rejected') {
-        this.drawDecisionBadge(pos.x, pos.y, false, 1, tk.opacity ?? 1);
+      ctx.save();
+      ctx.font =
+        box.iconFont ||
+        '24px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const icon of box.iconPositions) {
+        ctx.fillStyle = icon.color || box.iconColor || COLORS.text;
+        ctx.fillText(icon.glyph, icon.cx, icon.cy);
       }
-    }
-  }
+      ctx.restore();
 
-  drawDecisionBadge(x, y, approved, scale, opacity) {
-    const { ctx } = this;
-    if (scale <= 0) return;
-    ctx.save();
-    ctx.globalAlpha = opacity;
+      const labelFont = '600 12px "DM Mono", monospace';
+      ctx.font = labelFont;
+      const textW = ctx.measureText(box.label).width;
+      const padding = 6;
 
-    const r = 11 * scale;
-    const color = approved ? '#2d6a50' : '#c0392b';
-
-    // White halo so the badge reads against the ticket
-    ctx.beginPath();
-    ctx.arc(x, y, r + 1.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-
-    // Filled badge
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-
-    // Icon (only render once badge is mostly grown)
-    if (scale > 0.45) {
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      if (approved) {
-        ctx.beginPath();
-        ctx.moveTo(x - 4, y);
-        ctx.lineTo(x - 1, y + 3);
-        ctx.lineTo(x + 4, y - 3);
-        ctx.stroke();
+      ctx.save();
+      if (box.labelSide === "top") {
+        ctx.fillStyle = COLORS.surface;
+        ctx.fillRect(
+          x + w / 2 - textW / 2 - padding,
+          y - 8,
+          textW + padding * 2,
+          16,
+        );
+        ctx.fillStyle = COLORS.muted;
+        ctx.font = labelFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(box.label, x + w / 2, y);
       } else {
-        ctx.beginPath();
-        ctx.moveTo(x - 3.5, y - 3.5);
-        ctx.lineTo(x + 3.5, y + 3.5);
-        ctx.moveTo(x + 3.5, y - 3.5);
-        ctx.lineTo(x - 3.5, y + 3.5);
-        ctx.stroke();
+        const labelX = box.labelSide === "left" ? x : x + w;
+        ctx.translate(labelX, y + h / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = COLORS.surface;
+        ctx.fillRect(-textW / 2 - padding, -8, textW + padding * 2, 16);
+        ctx.fillStyle = COLORS.muted;
+        ctx.font = labelFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(box.label, 0, 0);
       }
+      ctx.restore();
     }
 
-    ctx.restore();
-  }
+    drawHub() {
+      const ctx = this.ctx;
 
-  getTicketPos(tk) {
-    if (tk.phase === 'agent-to-resolve') {
-      const e = easeInOut(tk.t);
-      return { x: lerp(tk.srcX, this.resolveX, e), y: lerp(tk.srcY, this.resolveY, e) };
-    }
-    if (tk.phase === 'resolve-to-reviewer') {
-      const r = this.reviewers[tk.reviewerIdx];
-      const e = easeInOut(tk.t);
-      return { x: lerp(this.resolveX, r.x, e), y: lerp(this.resolveY, r.y, e) };
-    }
-    if (tk.phase === 'reviewing' || tk.phase === 'reviewed' || tk.phase === 'rejected') {
-      const r = this.reviewers[tk.reviewerIdx];
-      // Position ticket slightly below the reviewer so the shield stays visible
-      return { x: r.x, y: r.y + this.reviewerR + 10 };
-    }
-    if (tk.phase === 'reviewer-to-resolve') {
-      const r = this.reviewers[tk.reviewerIdx];
-      const e = easeInOut(tk.t);
-      return { x: lerp(r.x, this.resolveX, e), y: lerp(r.y + this.reviewerR + 10, this.resolveY, e) };
-    }
-    if (tk.phase === 'resolve-to-service') {
-      const s = this.services[tk.type.service];
-      const e = easeInOut(tk.t);
-      return { x: lerp(this.resolveX, s.x, e), y: lerp(this.resolveY, s.y, e) };
-    }
-    if (tk.phase === 'service-response') {
-      const s = this.services[tk.type.service];
-      const e = easeInOut(tk.t);
-      return { x: lerp(s.x, this.resolveX, e), y: lerp(s.y, this.resolveY, e) };
-    }
-    return null;
-  }
+      let freshness = 0;
+      ctx.save();
+      for (const t of this.impulses) {
+        const age = (this.elapsed - t) / PULSE_RIPPLE_DURATION;
+        if (age < 0 || age > 1) continue;
+        const r = this.scopeR + age * PULSE_RIPPLE_DISTANCE;
+        const opacity = (1 - age) * 0.5;
+        ctx.strokeStyle = `rgba(92, 182, 224, ${opacity})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(this.scopeX, this.scopeY, r, 0, Math.PI * 2);
+        ctx.stroke();
+        freshness = Math.max(freshness, 1 - age);
+      }
+      ctx.restore();
 
-  drawTicket(x, y, tk, compact) {
-    const { ctx } = this;
-    ctx.save();
-    ctx.globalAlpha = tk.opacity ?? 1;
-
-    if (compact) {
-      // Response packet — small filled chip
+      ctx.save();
+      ctx.fillStyle = COLORS.pulseSofter;
       ctx.beginPath();
-      ctx.arc(x, y, 6, 0, Math.PI * 2);
-      ctx.fillStyle = tk.type.color;
+      ctx.arc(
+        this.scopeX,
+        this.scopeY,
+        this.scopeR + 14 + freshness * 4,
+        0,
+        Math.PI * 2,
+      );
       ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      ctx.fillStyle = COLORS.pulseSoft;
+      ctx.beginPath();
+      ctx.arc(
+        this.scopeX,
+        this.scopeY,
+        this.scopeR + 6 + freshness * 3,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
       ctx.restore();
-      return;
+
+      ctx.beginPath();
+      ctx.arc(this.scopeX, this.scopeY, this.scopeR, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS.pulseTint;
+      ctx.fill();
+      ctx.strokeStyle = COLORS.pulseRing;
+      ctx.lineWidth = 2.5 + freshness * 1.2;
+      ctx.stroke();
+
+      ctx.save();
+      ctx.fillStyle = COLORS.pulseRing;
+      ctx.font = '700 16px "DM Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("RESOLVE", this.scopeX, this.scopeY + 1);
+      ctx.restore();
     }
 
-    const w = this.tickW, h = this.tickH;
+    drawTickets() {
+      const ctx = this.ctx;
 
-    // Body
-    roundRect(ctx, x - w/2, y - h/2, w, h, 4);
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = tk.type.color;
-    ctx.lineWidth = 1.2;
-    ctx.fill();
-    ctx.stroke();
+      for (const tk of this.tickets) {
+        const t = this.elapsed - tk.spawnTime;
+        if (t < 0) continue;
 
-    // Color stripe (left edge)
-    ctx.save();
-    roundRect(ctx, x - w/2, y - h/2, w, h, 4);
-    ctx.clip();
-    ctx.fillStyle = tk.type.color;
-    ctx.fillRect(x - w/2, y - h/2, 4, h);
-    ctx.restore();
+        let docX, docY;
+        let alpha = 1;
+        let labelText = null;
+        let labelColor = null;
+        let drawSpinner = false;
 
-    // Centered type label
-    ctx.font = 'bold 7px "DM Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = tk.type.color;
-    ctx.fillText(tk.type.label, x + 2, y);
+        if (t < T_GEN) {
+          docX = this.docHomeX;
+          docY = this.docHomeY;
+          labelText = "creating ticket";
+          labelColor = "rgba(92, 182, 224, 1)";
+          drawSpinner = true;
+        } else if (t < T_SUP) {
+          const phaseT = (t - T_GEN) / TICKET_TRAVEL_TO_SUP_MS;
+          docX = this.docHomeX + (tk.supTargetX - this.docHomeX) * phaseT;
+          docY = this.docHomeY + (tk.supTargetY - this.docHomeY) * phaseT;
+        } else if (t < T_REVIEW) {
+          docX = tk.supTargetX;
+          docY = tk.supTargetY;
+          labelText = "reviewing";
+          labelColor = "rgba(122, 118, 112, 1)";
+        } else if (tk.outcome === "rejected") {
+          if (t < T_REJ_END) {
+            const fadeT = (t - T_REVIEW) / TICKET_FADE_MS;
+            docX = tk.supTargetX;
+            docY = tk.supTargetY;
+            alpha = 1 - fadeT;
+          } else {
+            continue;
+          }
+        } else {
+          if (t < T_BACK) {
+            const phaseT = (t - T_REVIEW) / TICKET_TRAVEL_BACK_MS;
+            docX = tk.supTargetX + (this.scopeX - tk.supTargetX) * phaseT;
+            docY = tk.supTargetY + (this.scopeY - tk.supTargetY) * phaseT;
+          } else if (t < T_TO_MS) {
+            const phaseT = (t - T_BACK) / TICKET_TRAVEL_TO_MS_MS;
+            docX = this.scopeX + (tk.msTargetX - this.scopeX) * phaseT;
+            docY = this.scopeY + (tk.msTargetY - this.scopeY) * phaseT;
+          } else if (t < T_PROCESS_END) {
+            docX = tk.msTargetX;
+            docY = tk.msTargetY;
+            labelText = "processing";
+            labelColor = "rgba(92, 182, 224, 1)";
+            drawSpinner = true;
+          } else {
+            continue;
+          }
+        }
 
-    ctx.restore();
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.font =
+          '24px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("🎫", docX, docY);
+
+        if (drawSpinner) {
+          const spinnerCx = docX;
+          const spinnerCy = docY + 26;
+          const spinnerR = 9;
+          const rotation = (this.elapsed / 600) * Math.PI * 2;
+          const arcLength = Math.PI * 1.4;
+          ctx.strokeStyle = "rgba(92, 182, 224, 0.2)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(spinnerCx, spinnerCy, spinnerR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.strokeStyle = COLORS.pulseRing;
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(
+            spinnerCx,
+            spinnerCy,
+            spinnerR,
+            rotation,
+            rotation + arcLength,
+          );
+          ctx.stroke();
+          ctx.lineCap = "butt";
+        }
+
+        if (labelText) {
+          ctx.font = '700 11px "DM Mono", monospace';
+          ctx.fillStyle = labelColor;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(labelText, docX, docY - 25);
+        }
+        ctx.restore();
+      }
+    }
+
+    drawApprovedLabels() {
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.font = '700 11px "DM Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const h of this.approvedLabels) {
+        const age = (this.elapsed - h.time) / LABEL_DURATION;
+        if (age < 0 || age > 1) continue;
+        const opacity = 1 - age;
+        const labelY = h.y - 22 - age * 14;
+        ctx.fillStyle = `rgba(45, 106, 80, ${opacity})`;
+        ctx.fillText("approved", h.x, labelY);
+      }
+      ctx.restore();
+    }
+
+    drawRejectedLabels() {
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.font = '700 11px "DM Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const h of this.rejectedLabels) {
+        const age = (this.elapsed - h.time) / LABEL_DURATION;
+        if (age < 0 || age > 1) continue;
+        const opacity = 1 - age;
+        const labelY = h.y - 22 - age * 14;
+        ctx.fillStyle = `rgba(193, 72, 72, ${opacity})`;
+        ctx.fillText("rejected", h.x, labelY);
+      }
+      ctx.restore();
+    }
+
+    drawProcessedLabels() {
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.font = '700 11px "DM Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const h of this.processedLabels) {
+        const age = (this.elapsed - h.time) / LABEL_DURATION;
+        if (age < 0 || age > 1) continue;
+        const opacity = 1 - age;
+        const labelY = h.y - 22 - age * 14;
+        ctx.fillStyle = `rgba(45, 106, 80, ${opacity})`;
+        ctx.fillText("processed", h.x, labelY);
+      }
+      ctx.restore();
+    }
+
+    drawLegend() {
+      const ctx = this.ctx;
+      const dividerY = ANIM_H;
+      const cy = ANIM_H + (this.logicalH - ANIM_H) / 2;
+      const items = [
+        { type: "polling", label: "Polling" },
+        { type: "meteor-blue", label: "Ticket request" },
+        { type: "ticket", label: "Ticket" },
+      ];
+      const slotW = this.logicalW / items.length;
+      const sampleW = 32;
+
+      ctx.save();
+      ctx.strokeStyle = COLORS.softBorder;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, dividerY);
+      ctx.lineTo(this.logicalW, dividerY);
+      ctx.stroke();
+
+      ctx.textBaseline = "middle";
+
+      items.forEach((item, i) => {
+        ctx.font = '600 11px "DM Mono", monospace';
+        ctx.textAlign = "left";
+        const labelW = ctx.measureText(item.label).width;
+        const slotCenterX = slotW * i + slotW / 2;
+        const totalW = sampleW + 10 + labelW;
+        const startX = slotCenterX - totalW / 2;
+        const sampleCx = startX + sampleW / 2;
+        const labelX = startX + sampleW + 10;
+
+        if (item.type === "polling") {
+          ctx.strokeStyle = COLORS.softBorder;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(startX, cy);
+          ctx.lineTo(startX + sampleW, cy);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = "rgba(240, 200, 90, 1)";
+          ctx.beginPath();
+          ctx.arc(sampleCx, cy, 4, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (item.type === "meteor-blue") {
+          for (let j = 6; j >= 0; j--) {
+            const px = startX + sampleW - j * 4;
+            const fade = 1 - j / 7;
+            const radius = 4 * (0.4 + 0.6 * fade);
+            ctx.fillStyle = `rgba(92, 182, 224, ${fade * 0.95})`;
+            ctx.beginPath();
+            ctx.arc(px, cy, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (item.type === "ticket") {
+          ctx.font =
+            '20px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+          ctx.textAlign = "center";
+          ctx.fillText("🎫", sampleCx, cy);
+        }
+
+        ctx.font = '600 11px "DM Mono", monospace';
+        ctx.textAlign = "left";
+        ctx.fillStyle = COLORS.muted;
+        ctx.fillText(item.label, labelX, cy);
+      });
+
+      ctx.restore();
+    }
   }
-}
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
+  function init() {
+    const canvas = document.getElementById("anim-hero");
+    if (!canvas) return;
+    const sim = new ResolveHero(canvas);
 
-function cssVar(name, fallback) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-}
+    const replayBtn = document.getElementById("anim-replay");
+    if (replayBtn) {
+      replayBtn.addEventListener("click", () => sim.start());
+    }
 
-function easeInOut(t) {
-  t = Math.max(0, Math.min(1, t));
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-}
+    sim.start();
+  }
 
-function lerp(a, b, t) { return a + (b - a) * t; }
-
-function roundRect(ctx, x, y, w, h, r) {
-  let rTL, rTR, rBR, rBL;
-  if (typeof r === 'object') {
-    rTL = r.tl ?? 0; rTR = r.tr ?? 0; rBR = r.br ?? 0; rBL = r.bl ?? 0;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    rTL = rTR = rBR = rBL = r;
+    init();
   }
-  // clamp
-  const maxR = Math.min(w, h) / 2;
-  rTL = Math.min(rTL, maxR); rTR = Math.min(rTR, maxR);
-  rBR = Math.min(rBR, maxR); rBL = Math.min(rBL, maxR);
-  ctx.beginPath();
-  ctx.moveTo(x + rTL, y);
-  ctx.lineTo(x + w - rTR, y);
-  if (rTR > 0) ctx.arcTo(x + w, y, x + w, y + rTR, rTR);
-  ctx.lineTo(x + w, y + h - rBR);
-  if (rBR > 0) ctx.arcTo(x + w, y + h, x + w - rBR, y + h, rBR);
-  ctx.lineTo(x + rBL, y + h);
-  if (rBL > 0) ctx.arcTo(x, y + h, x, y + h - rBL, rBL);
-  ctx.lineTo(x, y + rTL);
-  if (rTL > 0) ctx.arcTo(x, y, x + rTL, y, rTL);
-  ctx.closePath();
-}
-
-// ── INIT ─────────────────────────────────────────────────────────────────────
-
-const canvas    = document.getElementById('anim-hero');
-const counterEl = document.getElementById('anim-counter');
-if (canvas) new ResolveHero(canvas, counterEl);
+})();
