@@ -22,35 +22,21 @@
   const PULSE_RIPPLE_DURATION = 700;
   const PULSE_RIPPLE_DISTANCE = 24;
   const LABEL_DURATION = 1200;
-  const OP_HIT_DURATION = LABEL_DURATION;
-  const OP_DELAY = 500;
-  const SALE_LABEL_DURATION = LABEL_DURATION;
-  const COIN_LABEL_DURATION = LABEL_DURATION;
-  const REFUND_LABEL_DURATION = LABEL_DURATION;
 
-  const LIST_W = 240;
-  const LIST_H = 96;
-  const ITEM_H = 28;
-  const ITEM_FOCUS_MS = 1700;
-  const ITEM_SCROLL_MS = 300;
-  const ITEM_CYCLE_MS = ITEM_FOCUS_MS + ITEM_SCROLL_MS;
-  const FAILURE_RATE = 0.1;
-  const LIST_LOOKAHEAD = 5;
+  const DOC_GEN_MS = 1500;
+  const DOC_TRAVEL_TO_DASH_MS = 900;
+  const DOC_REVIEW_MS = 700;
+  const DOC_TRAVEL_TO_PROC_MS = 1000;
+  const DOC_TOTAL_MS =
+    DOC_GEN_MS +
+    DOC_TRAVEL_TO_DASH_MS +
+    DOC_REVIEW_MS +
+    DOC_TRAVEL_TO_PROC_MS;
+  const DISPUTE_INTERVAL = DOC_TOTAL_MS;
 
-  const PROVIDER_COLOR = {
-    stripe: "#635BFF",
-    paypal: "#003087",
-  };
   const PROVIDER_NAMES = ["stripe", "paypal"];
 
-  function generatePayment() {
-    const amount = (Math.random() * 195 + 5).toFixed(2);
-    const provider =
-      PROVIDER_NAMES[Math.floor(Math.random() * PROVIDER_NAMES.length)];
-    return { amount: `$${amount}`, provider, status: "pending" };
-  }
-
-  class NexusHero {
+  class ShieldHero {
     constructor(canvas) {
       this.canvas = canvas;
       this.ctx = canvas.getContext("2d");
@@ -67,21 +53,15 @@
       this.elapsed = 0;
       this.startTime = 0;
       this.impulses = [];
-      this.opHits = [];
-      this.pendingOps = [];
-      this.saleLabels = [];
-      this.coinHits = [];
-      this.refundLabels = [];
+      this.disputeLabels = [];
+      this.submitLabels = [];
+      this.approvedLabels = [];
+      this.documents = [];
       if (this.flows) {
         for (const f of this.flows) {
           f.dots = [];
           f.nextSpawnAt = 0;
         }
-      }
-      this.paymentList = [];
-      this.lastVerdictIdx = 0;
-      for (let i = 0; i < LIST_LOOKAHEAD; i++) {
-        this.paymentList.push(generatePayment());
       }
       this.draw();
     }
@@ -105,24 +85,10 @@
         if (!f.manual) {
           while (this.elapsed >= f.nextSpawnAt) {
             this.spawnDot(f, f.nextSpawnAt);
-            if (f.id === "storefront-payment") {
+            if (f.id === "dispute") {
               const lastDot = f.dots[f.dots.length - 1];
               if (lastDot) {
-                this.saleLabels.push({
-                  time: lastDot.startTime,
-                  x: lastDot.ox,
-                  y: lastDot.oy,
-                });
-                this.spawnStorefrontNexus(
-                  lastDot.startTime,
-                  lastDot.ox,
-                  lastDot.oy,
-                );
-              }
-            } else if (f.id === "consumer-op") {
-              const lastDot = f.dots[f.dots.length - 1];
-              if (lastDot) {
-                this.refundLabels.push({
+                this.disputeLabels.push({
                   time: lastDot.startTime,
                   x: lastDot.ox,
                   y: lastDot.oy,
@@ -137,88 +103,41 @@
         for (const d of f.dots) {
           if (this.elapsed - d.startTime < d.duration) {
             stillAlive.push(d);
-          } else if (f.id === "consumer-op") {
+          } else if (f.id === "dispute") {
             this.impulses.push(d.startTime + d.duration);
-            this.pendingOps.push({
-              fireAt: d.startTime + d.duration + OP_DELAY,
-            });
-          } else if (f.id === "op-execution") {
-            this.opHits.push({
-              time: d.startTime + d.duration,
-              x: d.tx,
-              y: d.ty,
-            });
-          } else if (f.id === "storefront-payment") {
-            this.coinHits.push({
-              time: d.startTime + d.duration,
-              x: d.tx,
-              y: d.ty,
-            });
-          } else if (f.id === "storefront-nexus") {
-            this.impulses.push(d.startTime + d.duration);
+            this.spawnDocument(d.startTime + d.duration, d.provider);
           }
         }
         f.dots = stillAlive;
       }
 
-      const remainingPending = [];
-      for (const p of this.pendingOps) {
-        if (this.elapsed >= p.fireAt) {
-          this.spawnDot(this.opExecutionFlow, p.fireAt);
+      const aliveDocs = [];
+      for (const doc of this.documents) {
+        const t = this.elapsed - doc.spawnTime;
+        if (t < DOC_TOTAL_MS) {
+          aliveDocs.push(doc);
         } else {
-          remainingPending.push(p);
+          this.submitLabels.push({
+            time: doc.spawnTime + DOC_TOTAL_MS,
+            x: doc.procTargetX,
+            y: doc.procTargetY,
+          });
         }
       }
-      this.pendingOps = remainingPending;
+      this.documents = aliveDocs;
 
       this.impulses = this.impulses.filter(
         (t) => this.elapsed - t < PULSE_RIPPLE_DURATION,
       );
-      this.opHits = this.opHits.filter(
-        (h) => this.elapsed - h.time < OP_HIT_DURATION,
+      this.disputeLabels = this.disputeLabels.filter(
+        (h) => this.elapsed - h.time < LABEL_DURATION,
       );
-      this.saleLabels = this.saleLabels.filter(
-        (h) => this.elapsed - h.time < SALE_LABEL_DURATION,
+      this.submitLabels = this.submitLabels.filter(
+        (h) => this.elapsed - h.time < LABEL_DURATION,
       );
-      this.coinHits = this.coinHits.filter(
-        (h) => this.elapsed - h.time < COIN_LABEL_DURATION,
+      this.approvedLabels = this.approvedLabels.filter(
+        (h) => this.elapsed - h.time < LABEL_DURATION,
       );
-      this.refundLabels = this.refundLabels.filter(
-        (h) => this.elapsed - h.time < REFUND_LABEL_DURATION,
-      );
-
-      const focusIdx = Math.floor(this.elapsed / ITEM_CYCLE_MS);
-      const cycleAge = this.elapsed % ITEM_CYCLE_MS;
-      const verdictThreshold =
-        cycleAge >= ITEM_FOCUS_MS ? focusIdx + 1 : focusIdx;
-      while (this.lastVerdictIdx < verdictThreshold) {
-        const item = this.paymentList[this.lastVerdictIdx];
-        if (item) {
-          item.status =
-            Math.random() < FAILURE_RATE ? "failed" : "consolidated";
-        }
-        this.lastVerdictIdx++;
-      }
-      while (this.paymentList.length < focusIdx + LIST_LOOKAHEAD) {
-        this.paymentList.push(generatePayment());
-      }
-    }
-
-    spawnStorefrontNexus(startTime, ox, oy) {
-      const f = this.storefrontNexusFlow;
-      const dx = this.scopeX - ox;
-      const dy = this.scopeY - oy;
-      const dist = Math.hypot(dx, dy) || 1;
-      const tx = this.scopeX - (dx / dist) * this.scopeR;
-      const ty = this.scopeY - (dy / dist) * this.scopeR;
-      f.dots.push({
-        startTime,
-        duration: f.travel,
-        ox,
-        oy,
-        tx,
-        ty,
-      });
     }
 
     spawnDot(f, startTime) {
@@ -226,11 +145,12 @@
         f.dots.push({ startTime, duration: f.travel });
       } else if (f.style === "event") {
         let ox, oy, tx, ty;
+        let provider = null;
         if (f.spawnPattern === "from-box-to-scope") {
-          const src =
-            f.sourceBox.iconPositions[
-              Math.floor(Math.random() * f.sourceBox.iconPositions.length)
-            ];
+          const idx = Math.floor(
+            Math.random() * f.sourceBox.iconPositions.length,
+          );
+          const src = f.sourceBox.iconPositions[idx];
           ox = src.cx;
           oy = src.cy;
           const dx = this.scopeX - ox;
@@ -238,38 +158,41 @@
           const dist = Math.hypot(dx, dy) || 1;
           tx = this.scopeX - (dx / dist) * this.scopeR;
           ty = this.scopeY - (dy / dist) * this.scopeR;
-        } else if (f.spawnPattern === "from-box-to-random-box-icon") {
-          const src =
-            f.sourceBox.iconPositions[
-              Math.floor(Math.random() * f.sourceBox.iconPositions.length)
-            ];
-          ox = src.cx;
-          oy = src.cy;
-          const targetBox =
-            f.targetBoxes[Math.floor(Math.random() * f.targetBoxes.length)];
-          const target =
-            targetBox.iconPositions[
-              Math.floor(Math.random() * targetBox.iconPositions.length)
-            ];
-          tx = target.cx;
-          ty = target.cy;
-        } else if (f.spawnPattern === "from-scope-to-random-box-icon") {
-          const targetBox =
-            f.targetBoxes[Math.floor(Math.random() * f.targetBoxes.length)];
-          const target =
-            targetBox.iconPositions[
-              Math.floor(Math.random() * targetBox.iconPositions.length)
-            ];
-          tx = target.cx;
-          ty = target.cy;
-          const dx = tx - this.scopeX;
-          const dy = ty - this.scopeY;
-          const dist = Math.hypot(dx, dy) || 1;
-          ox = this.scopeX + (dx / dist) * this.scopeR;
-          oy = this.scopeY + (dy / dist) * this.scopeR;
+          if (f.sourceBox === this.processors) {
+            provider = PROVIDER_NAMES[idx];
+          }
         }
-        f.dots.push({ startTime, duration: f.travel, ox, oy, tx, ty });
+        const dot = { startTime, duration: f.travel, ox, oy, tx, ty };
+        if (provider) dot.provider = provider;
+        f.dots.push(dot);
       }
+    }
+
+    spawnDocument(startTime, provider) {
+      const dashIcon =
+        this.dashboard.iconPositions[
+          Math.floor(Math.random() * this.dashboard.iconPositions.length)
+        ];
+      const procIcon =
+        this.processorIconByProvider[provider] ||
+        this.processors.iconPositions[0];
+      this.documents.push({
+        spawnTime: startTime,
+        provider,
+        dashTargetX: dashIcon.cx,
+        dashTargetY: dashIcon.cy,
+        procTargetX: procIcon.cx,
+        procTargetY: procIcon.cy,
+      });
+      this.approvedLabels.push({
+        time:
+          startTime +
+          DOC_GEN_MS +
+          DOC_TRAVEL_TO_DASH_MS +
+          DOC_REVIEW_MS,
+        x: dashIcon.cx,
+        y: dashIcon.cy,
+      });
     }
 
     setupHiDPI() {
@@ -295,26 +218,26 @@
       const processorsH = 80;
       const processorsX = this.scopeX - processorsW / 2;
 
-      this.storefront = {
-        id: "storefront",
-        label: "storefront",
+      this.microservices = {
+        id: "microservices",
+        label: "microservices",
         labelSide: "left",
         x: BOX_MARGIN,
         y: yTop,
         w: BOX_W,
         h: totalH,
-        icons: ["🛒", "🏪", "🛍️"],
+        icons: ["📦", "🚚", "🧾"],
       };
 
-      this.consumers = {
-        id: "consumers",
-        label: "consumers",
+      this.dashboard = {
+        id: "dashboard",
+        label: "dashboard",
         labelSide: "right",
         x: rightX,
         y: yTop,
         w: BOX_W,
         h: totalH,
-        icons: ["🖥️", "📊", "💁"],
+        icons: ["🖥️", "📝", "💁"],
       };
 
       this.processors = {
@@ -333,8 +256,7 @@
         iconFont: '400 36px "Font Awesome 6 Brands"',
       };
 
-
-      this.boxes = [this.storefront, this.consumers, this.processors];
+      this.boxes = [this.microservices, this.dashboard, this.processors];
 
       for (const box of this.boxes) {
         const n = box.icons.length;
@@ -373,15 +295,21 @@
         }
       }
 
-      const processorsBottom = this.processors.y + this.processors.h;
+      this.processorIconByProvider = {
+        stripe: this.processors.iconPositions[0],
+        paypal: this.processors.iconPositions[1],
+      };
+
+      this.docHomeX = this.scopeX;
+      this.docHomeY = this.scopeY + this.scopeR + 60;
 
       this.flows = [
         {
-          id: "processors-poll",
-          fromX: this.scopeX,
-          fromY: processorsBottom,
-          toX: this.scopeX,
-          toY: this.scopeY - this.scopeR,
+          id: "microservices-poll",
+          fromX: this.microservices.x + this.microservices.w,
+          fromY: this.scopeY,
+          toX: this.scopeX - this.scopeR,
+          toY: this.scopeY,
           rgb: "240, 200, 90",
           style: "linear",
           spawnInterval: 800,
@@ -390,66 +318,17 @@
           nextSpawnAt: 0,
         },
         {
-          id: "nexus-consumers-poll",
-          fromX: this.scopeX + this.scopeR,
-          fromY: this.scopeY,
-          toX: this.consumers.x,
-          toY: this.scopeY,
-          rgb: "240, 200, 90",
-          style: "linear",
-          spawnInterval: 1100,
-          travel: 1500,
-          dots: [],
-          nextSpawnAt: 0,
-        },
-        {
-          id: "consumer-op",
-          sourceBox: this.consumers,
+          id: "dispute",
+          sourceBox: this.processors,
           spawnPattern: "from-box-to-scope",
           rgb: "193, 72, 72",
           style: "event",
-          spawnInterval: 3000,
+          spawnInterval: DISPUTE_INTERVAL,
           travel: 800,
           dots: [],
           nextSpawnAt: 0,
         },
-        {
-          id: "storefront-payment",
-          sourceBox: this.storefront,
-          targetBoxes: [this.processors],
-          spawnPattern: "from-box-to-random-box-icon",
-          rgb: "92, 182, 224",
-          style: "event",
-          spawnInterval: 1500,
-          travel: 900,
-          dots: [],
-          nextSpawnAt: 0,
-        },
       ];
-
-      this.opExecutionFlow = {
-        id: "op-execution",
-        targetBoxes: [this.processors],
-        spawnPattern: "from-scope-to-random-box-icon",
-        rgb: "193, 72, 72",
-        style: "event",
-        travel: 900,
-        dots: [],
-        nextSpawnAt: 0,
-        manual: true,
-      };
-      this.flows.push(this.opExecutionFlow);
-
-      this.storefrontNexusFlow = {
-        id: "storefront-nexus",
-        rgb: "92, 182, 224",
-        style: "event",
-        travel: 850,
-        dots: [],
-        nextSpawnAt: 0,
-        manual: true,
-      };
-      this.flows.push(this.storefrontNexusFlow);
 
       for (const f of this.flows) {
         if (f.style !== "linear") continue;
@@ -473,13 +352,6 @@
         }
         f.totalLen = total;
       }
-
-      this.list = {
-        x: this.scopeX - LIST_W / 2,
-        y: this.scopeY + this.scopeR + 25,
-        w: LIST_W,
-        h: LIST_H,
-      };
     }
 
     draw() {
@@ -488,63 +360,27 @@
       this.drawFlowLines();
       for (const box of this.boxes) this.drawBox(box);
       this.drawHub();
-      this.drawList();
+      this.drawDocuments();
       this.drawFlowDots();
-      this.drawOpHits();
-      this.drawSaleLabels();
-      this.drawCoinHits();
-      this.drawRefundLabels();
+      this.drawDisputeLabels();
+      this.drawApprovedLabels();
+      this.drawSubmitLabels();
       this.drawLegend();
     }
 
-    drawRefundLabels() {
+    drawApprovedLabels() {
       const ctx = this.ctx;
       ctx.save();
       ctx.font = '700 11px "DM Mono", monospace';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      for (const h of this.refundLabels) {
-        const age = (this.elapsed - h.time) / REFUND_LABEL_DURATION;
-        if (age < 0 || age > 1) continue;
-        const opacity = 1 - age;
-        const labelY = h.y - 22 - age * 14;
-        ctx.fillStyle = `rgba(193, 72, 72, ${opacity})`;
-        ctx.fillText("refund", h.x, labelY);
-      }
-      ctx.restore();
-    }
-
-    drawSaleLabels() {
-      const ctx = this.ctx;
-      ctx.save();
-      ctx.font = '700 11px "DM Mono", monospace';
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      for (const h of this.saleLabels) {
-        const age = (this.elapsed - h.time) / SALE_LABEL_DURATION;
+      for (const h of this.approvedLabels) {
+        const age = (this.elapsed - h.time) / LABEL_DURATION;
         if (age < 0 || age > 1) continue;
         const opacity = 1 - age;
         const labelY = h.y - 22 - age * 14;
         ctx.fillStyle = `rgba(45, 106, 80, ${opacity})`;
-        ctx.fillText("sale", h.x, labelY);
-      }
-      ctx.restore();
-    }
-
-    drawCoinHits() {
-      const ctx = this.ctx;
-      ctx.save();
-      ctx.font =
-        '20px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      for (const h of this.coinHits) {
-        const age = (this.elapsed - h.time) / COIN_LABEL_DURATION;
-        if (age < 0 || age > 1) continue;
-        const opacity = 1 - age;
-        const labelY = h.y - 22 - age * 14;
-        ctx.globalAlpha = opacity;
-        ctx.fillText("🪙", h.x, labelY);
+        ctx.fillText("approved", h.x, labelY);
       }
       ctx.restore();
     }
@@ -720,131 +556,128 @@
 
       ctx.save();
       ctx.fillStyle = COLORS.pulseRing;
-      ctx.font = '700 18px "DM Mono", monospace';
+      ctx.font = '700 17px "DM Mono", monospace';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("NEXUS", this.scopeX, this.scopeY + 1);
+      ctx.fillText("SHIELD", this.scopeX, this.scopeY + 1);
       ctx.restore();
     }
 
-    drawList() {
+    drawDocuments() {
       const ctx = this.ctx;
-      const { x, y, w, h } = this.list;
-      const focusIdx = Math.floor(this.elapsed / ITEM_CYCLE_MS);
-      const cycleAge = this.elapsed % ITEM_CYCLE_MS;
-      const scrollProgress =
-        cycleAge > ITEM_FOCUS_MS
-          ? (cycleAge - ITEM_FOCUS_MS) / ITEM_SCROLL_MS
-          : 0;
-      const focusY = y + h / 2;
+      const T1 = DOC_GEN_MS;
+      const T2 = T1 + DOC_TRAVEL_TO_DASH_MS;
+      const T3 = T2 + DOC_REVIEW_MS;
+      const T4 = T3 + DOC_TRAVEL_TO_PROC_MS;
 
       ctx.save();
-      ctx.beginPath();
-      ctx.rect(x, y, w, h);
-      ctx.clip();
+      for (const doc of this.documents) {
+        const t = this.elapsed - doc.spawnTime;
+        if (t < 0 || t >= T4) continue;
 
-      for (let offsetInt = -2; offsetInt <= 2; offsetInt++) {
-        const idx = focusIdx + offsetInt;
-        if (idx < 0 || idx >= this.paymentList.length) continue;
-        const item = this.paymentList[idx];
-        const offset = offsetInt - scrollProgress;
-        const itemY = focusY + offset * ITEM_H;
-        const alpha = Math.max(0, Math.min(1, 2 - Math.abs(offset)));
-        if (alpha <= 0.01) continue;
-        const isFocused = item.status === "pending" && idx === focusIdx;
-        this.drawListItem(item, itemY, alpha, isFocused);
+        let docX, docY;
+        let labelText = null;
+        let labelColor = null;
+
+        if (t < T1) {
+          docX = this.docHomeX;
+          docY = this.docHomeY;
+          labelText = "generating evidence document";
+          labelColor = "rgba(92, 182, 224, 1)";
+
+          const spinnerCx = docX;
+          const spinnerCy = docY + 26;
+          const spinnerR = 9;
+          const rotation = (this.elapsed / 600) * Math.PI * 2;
+          const arcLength = Math.PI * 1.4;
+          ctx.strokeStyle = "rgba(92, 182, 224, 0.2)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(spinnerCx, spinnerCy, spinnerR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.strokeStyle = COLORS.pulseRing;
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(
+            spinnerCx,
+            spinnerCy,
+            spinnerR,
+            rotation,
+            rotation + arcLength,
+          );
+          ctx.stroke();
+          ctx.lineCap = "butt";
+        } else if (t < T2) {
+          const phaseT = (t - T1) / DOC_TRAVEL_TO_DASH_MS;
+          docX =
+            this.docHomeX +
+            (doc.dashTargetX - this.docHomeX) * phaseT;
+          docY =
+            this.docHomeY +
+            (doc.dashTargetY - this.docHomeY) * phaseT;
+        } else if (t < T3) {
+          docX = doc.dashTargetX;
+          docY = doc.dashTargetY;
+          labelText = "reviewing";
+          labelColor = "rgba(45, 106, 80, 1)";
+        } else {
+          const phaseT = (t - T3) / DOC_TRAVEL_TO_PROC_MS;
+          docX =
+            doc.dashTargetX +
+            (doc.procTargetX - doc.dashTargetX) * phaseT;
+          docY =
+            doc.dashTargetY +
+            (doc.procTargetY - doc.dashTargetY) * phaseT;
+        }
+
+        ctx.font =
+          '24px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("📄", docX, docY);
+
+        if (labelText) {
+          ctx.font = '700 11px "DM Mono", monospace';
+          ctx.fillStyle = labelColor;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(labelText, docX, docY - 25);
+        }
       }
-
       ctx.restore();
     }
 
-    drawListItem(item, cy, alpha, isFocused) {
-      const ctx = this.ctx;
-      const { x, w } = this.list;
-      const cardW = w - 12;
-      const cardH = ITEM_H - 4;
-      const cardX = x + 6;
-      const cardY = cy - cardH / 2;
-
-      let borderColor = COLORS.softBorder;
-      let bgColor = COLORS.surface;
-      let textColor = COLORS.muted;
-      let statusColor = COLORS.muted;
-      let statusText = "queued";
-      let lineWidth = 1;
-
-      if (item.status === "failed") {
-        borderColor = "#c14848";
-        bgColor = "#fbe8e8";
-        textColor = "#c14848";
-        statusColor = "#c14848";
-        statusText = "✗ failed";
-        lineWidth = 1.5;
-      } else if (item.status === "consolidated") {
-        borderColor = "#2d6a50";
-        bgColor = "#e3efe9";
-        textColor = "#2d6a50";
-        statusColor = "#2d6a50";
-        statusText = "✓ consolidated";
-        lineWidth = 1.5;
-      } else if (isFocused) {
-        borderColor = COLORS.pulseRing;
-        bgColor = "#eaf6fb";
-        textColor = COLORS.text;
-        statusColor = COLORS.pulseRing;
-        statusText = "consolidating…";
-        lineWidth = 1.75;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = alpha;
-
-      ctx.beginPath();
-      if (typeof ctx.roundRect === "function") {
-        ctx.roundRect(cardX, cardY, cardW, cardH, 6);
-      } else {
-        ctx.rect(cardX, cardY, cardW, cardH);
-      }
-      ctx.fillStyle = bgColor;
-      ctx.fill();
-      ctx.strokeStyle = borderColor;
-      ctx.lineWidth = lineWidth;
-      ctx.stroke();
-
-      ctx.font = '600 11px "DM Mono", monospace';
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-
-      const amountText = `${item.amount}  `;
-      ctx.fillStyle = textColor;
-      ctx.fillText(amountText, cardX + 9, cy);
-      const amountW = ctx.measureText(amountText).width;
-
-      ctx.fillStyle = PROVIDER_COLOR[item.provider] || textColor;
-      ctx.fillText(item.provider, cardX + 9 + amountW, cy);
-
-      ctx.font = '600 9px "DM Mono", monospace';
-      ctx.fillStyle = statusColor;
-      ctx.textAlign = "right";
-      ctx.fillText(statusText, cardX + cardW - 9, cy);
-
-      ctx.restore();
-    }
-
-    drawOpHits() {
+    drawDisputeLabels() {
       const ctx = this.ctx;
       ctx.save();
-      ctx.font =
-        '20px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+      ctx.font = '700 11px "DM Mono", monospace';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      for (const h of this.opHits) {
-        const age = (this.elapsed - h.time) / OP_HIT_DURATION;
+      for (const h of this.disputeLabels) {
+        const age = (this.elapsed - h.time) / LABEL_DURATION;
         if (age < 0 || age > 1) continue;
         const opacity = 1 - age;
         const labelY = h.y - 22 - age * 14;
-        ctx.globalAlpha = opacity;
-        ctx.fillText("💸", h.x, labelY);
+        ctx.fillStyle = `rgba(193, 72, 72, ${opacity})`;
+        ctx.fillText("dispute", h.x, labelY);
+      }
+      ctx.restore();
+    }
+
+    drawSubmitLabels() {
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.font = '700 11px "DM Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const h of this.submitLabels) {
+        const age = (this.elapsed - h.time) / LABEL_DURATION;
+        if (age < 0 || age > 1) continue;
+        const opacity = 1 - age;
+        const labelY = h.y - 22 - age * 14;
+        ctx.fillStyle = `rgba(45, 106, 80, ${opacity})`;
+        ctx.fillText("submitted", h.x, labelY);
       }
       ctx.restore();
     }
@@ -855,8 +688,8 @@
       const cy = ANIM_H + (this.logicalH - ANIM_H) / 2;
       const items = [
         { type: "polling", label: "Polling" },
-        { type: "meteor-blue", label: "Payment" },
-        { type: "meteor-red", label: "Refund" },
+        { type: "meteor-red", label: "Dispute" },
+        { type: "document", label: "Evidence document" },
       ];
       const slotW = this.logicalW / items.length;
       const sampleW = 32;
@@ -894,23 +727,25 @@
           ctx.beginPath();
           ctx.arc(sampleCx, cy, 4, 0, Math.PI * 2);
           ctx.fill();
-        } else if (
-          item.type === "meteor-blue" ||
-          item.type === "meteor-red"
-        ) {
-          const rgb =
-            item.type === "meteor-blue" ? "92, 182, 224" : "193, 72, 72";
+        } else if (item.type === "meteor-red") {
           for (let j = 6; j >= 0; j--) {
             const px = startX + sampleW - j * 4;
             const fade = 1 - j / 7;
             const radius = 4 * (0.4 + 0.6 * fade);
-            ctx.fillStyle = `rgba(${rgb}, ${fade * 0.95})`;
+            ctx.fillStyle = `rgba(193, 72, 72, ${fade * 0.95})`;
             ctx.beginPath();
             ctx.arc(px, cy, radius, 0, Math.PI * 2);
             ctx.fill();
           }
+        } else if (item.type === "document") {
+          ctx.font =
+            '20px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+          ctx.textAlign = "center";
+          ctx.fillText("📄", sampleCx, cy);
         }
 
+        ctx.font = '600 11px "DM Mono", monospace';
+        ctx.textAlign = "left";
         ctx.fillStyle = COLORS.muted;
         ctx.fillText(item.label, labelX, cy);
       });
@@ -922,7 +757,7 @@
   function init() {
     const canvas = document.getElementById("anim-hero");
     if (!canvas) return;
-    const sim = new NexusHero(canvas);
+    const sim = new ShieldHero(canvas);
 
     const replayBtn = document.getElementById("anim-replay");
     if (replayBtn) {

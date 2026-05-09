@@ -14,6 +14,7 @@
   const HUB_RADIUS = 50;
   const BOX_W = 80;
   const BOX_MARGIN = 30;
+  const BOX_GAP = 20;
   const ICON_SIZE = 30;
 
   const FLOW_DOT_RADIUS = 4;
@@ -21,36 +22,44 @@
   const FLOW_TRAIL_GAP = 0.045;
   const PULSE_RIPPLE_DURATION = 700;
   const PULSE_RIPPLE_DISTANCE = 24;
-  const LABEL_DURATION = 1200;
-  const OP_HIT_DURATION = LABEL_DURATION;
-  const OP_DELAY = 500;
-  const SALE_LABEL_DURATION = LABEL_DURATION;
-  const COIN_LABEL_DURATION = LABEL_DURATION;
-  const REFUND_LABEL_DURATION = LABEL_DURATION;
+  const BLOCK_HIT_DURATION = 1400;
 
-  const LIST_W = 240;
+  const LIST_W = 200;
   const LIST_H = 96;
   const ITEM_H = 28;
   const ITEM_FOCUS_MS = 1700;
   const ITEM_SCROLL_MS = 300;
   const ITEM_CYCLE_MS = ITEM_FOCUS_MS + ITEM_SCROLL_MS;
-  const FAILURE_RATE = 0.1;
+  const BLACKLIST_RATE = 0.6;
   const LIST_LOOKAHEAD = 5;
+  const CHANNEL_NAMES = [
+    "@CookingPro",
+    "@TechDaily",
+    "@FitnessHub",
+    "@GamerArena",
+    "@TravelGo",
+    "@MusicMix",
+    "@LearnFast",
+    "@DIYCraft",
+    "@DailyNews",
+    "@MovieRev",
+    "@KidsZone",
+    "@SciencePop",
+    "@CarFans",
+    "@FashionTV",
+    "@PetWorld",
+    "@FoodieLife",
+    "@AdventureX",
+    "@StyleStudio",
+    "@HealthyU",
+    "@Cricket99",
+  ];
 
-  const PROVIDER_COLOR = {
-    stripe: "#635BFF",
-    paypal: "#003087",
-  };
-  const PROVIDER_NAMES = ["stripe", "paypal"];
-
-  function generatePayment() {
-    const amount = (Math.random() * 195 + 5).toFixed(2);
-    const provider =
-      PROVIDER_NAMES[Math.floor(Math.random() * PROVIDER_NAMES.length)];
-    return { amount: `$${amount}`, provider, status: "pending" };
+  function pickChannelName() {
+    return CHANNEL_NAMES[Math.floor(Math.random() * CHANNEL_NAMES.length)];
   }
 
-  class NexusHero {
+  class ScopeHero {
     constructor(canvas) {
       this.canvas = canvas;
       this.ctx = canvas.getContext("2d");
@@ -67,21 +76,17 @@
       this.elapsed = 0;
       this.startTime = 0;
       this.impulses = [];
-      this.opHits = [];
-      this.pendingOps = [];
-      this.saleLabels = [];
-      this.coinHits = [];
-      this.refundLabels = [];
+      this.blockHits = [];
       if (this.flows) {
         for (const f of this.flows) {
           f.dots = [];
           f.nextSpawnAt = 0;
         }
       }
-      this.paymentList = [];
+      this.channelList = [];
       this.lastVerdictIdx = 0;
       for (let i = 0; i < LIST_LOOKAHEAD; i++) {
-        this.paymentList.push(generatePayment());
+        this.channelList.push({ name: pickChannelName(), status: "pending" });
       }
       this.draw();
     }
@@ -105,30 +110,6 @@
         if (!f.manual) {
           while (this.elapsed >= f.nextSpawnAt) {
             this.spawnDot(f, f.nextSpawnAt);
-            if (f.id === "storefront-payment") {
-              const lastDot = f.dots[f.dots.length - 1];
-              if (lastDot) {
-                this.saleLabels.push({
-                  time: lastDot.startTime,
-                  x: lastDot.ox,
-                  y: lastDot.oy,
-                });
-                this.spawnStorefrontNexus(
-                  lastDot.startTime,
-                  lastDot.ox,
-                  lastDot.oy,
-                );
-              }
-            } else if (f.id === "consumer-op") {
-              const lastDot = f.dots[f.dots.length - 1];
-              if (lastDot) {
-                this.refundLabels.push({
-                  time: lastDot.startTime,
-                  x: lastDot.ox,
-                  y: lastDot.oy,
-                });
-              }
-            }
             f.nextSpawnAt += f.spawnInterval;
           }
         }
@@ -137,54 +118,24 @@
         for (const d of f.dots) {
           if (this.elapsed - d.startTime < d.duration) {
             stillAlive.push(d);
-          } else if (f.id === "consumer-op") {
+          } else if (f.id === "dashboard-instruction") {
             this.impulses.push(d.startTime + d.duration);
-            this.pendingOps.push({
-              fireAt: d.startTime + d.duration + OP_DELAY,
-            });
-          } else if (f.id === "op-execution") {
-            this.opHits.push({
+          } else if (f.id === "rule-update") {
+            this.blockHits.push({
               time: d.startTime + d.duration,
               x: d.tx,
               y: d.ty,
             });
-          } else if (f.id === "storefront-payment") {
-            this.coinHits.push({
-              time: d.startTime + d.duration,
-              x: d.tx,
-              y: d.ty,
-            });
-          } else if (f.id === "storefront-nexus") {
-            this.impulses.push(d.startTime + d.duration);
           }
         }
         f.dots = stillAlive;
       }
 
-      const remainingPending = [];
-      for (const p of this.pendingOps) {
-        if (this.elapsed >= p.fireAt) {
-          this.spawnDot(this.opExecutionFlow, p.fireAt);
-        } else {
-          remainingPending.push(p);
-        }
-      }
-      this.pendingOps = remainingPending;
-
       this.impulses = this.impulses.filter(
         (t) => this.elapsed - t < PULSE_RIPPLE_DURATION,
       );
-      this.opHits = this.opHits.filter(
-        (h) => this.elapsed - h.time < OP_HIT_DURATION,
-      );
-      this.saleLabels = this.saleLabels.filter(
-        (h) => this.elapsed - h.time < SALE_LABEL_DURATION,
-      );
-      this.coinHits = this.coinHits.filter(
-        (h) => this.elapsed - h.time < COIN_LABEL_DURATION,
-      );
-      this.refundLabels = this.refundLabels.filter(
-        (h) => this.elapsed - h.time < REFUND_LABEL_DURATION,
+      this.blockHits = this.blockHits.filter(
+        (h) => this.elapsed - h.time < BLOCK_HIT_DURATION,
       );
 
       const focusIdx = Math.floor(this.elapsed / ITEM_CYCLE_MS);
@@ -192,32 +143,40 @@
       const verdictThreshold =
         cycleAge >= ITEM_FOCUS_MS ? focusIdx + 1 : focusIdx;
       while (this.lastVerdictIdx < verdictThreshold) {
-        const item = this.paymentList[this.lastVerdictIdx];
+        const item = this.channelList[this.lastVerdictIdx];
         if (item) {
-          item.status =
-            Math.random() < FAILURE_RATE ? "failed" : "consolidated";
+          const verdict =
+            Math.random() < BLACKLIST_RATE ? "blocked" : "kept";
+          item.status = verdict;
+          if (verdict === "blocked") {
+            const verdictTime =
+              this.lastVerdictIdx * ITEM_CYCLE_MS + ITEM_FOCUS_MS;
+            this.spawnBlockMeteor(verdictTime);
+          }
         }
         this.lastVerdictIdx++;
       }
-      while (this.paymentList.length < focusIdx + LIST_LOOKAHEAD) {
-        this.paymentList.push(generatePayment());
+      while (this.channelList.length < focusIdx + LIST_LOOKAHEAD) {
+        this.channelList.push({
+          name: pickChannelName(),
+          status: "pending",
+        });
       }
     }
 
-    spawnStorefrontNexus(startTime, ox, oy) {
-      const f = this.storefrontNexusFlow;
-      const dx = this.scopeX - ox;
-      const dy = this.scopeY - oy;
-      const dist = Math.hypot(dx, dy) || 1;
-      const tx = this.scopeX - (dx / dist) * this.scopeR;
-      const ty = this.scopeY - (dy / dist) * this.scopeR;
+    spawnBlockMeteor(startTime) {
+      const f = this.ruleUpdateFlow;
+      const target =
+        f.targetBox.iconPositions[
+          Math.floor(Math.random() * f.targetBox.iconPositions.length)
+        ];
       f.dots.push({
         startTime,
         duration: f.travel,
-        ox,
-        oy,
-        tx,
-        ty,
+        ox: this.blockedMeteorOrigin.x,
+        oy: this.blockedMeteorOrigin.y,
+        tx: target.cx,
+        ty: target.cy,
       });
     }
 
@@ -238,27 +197,10 @@
           const dist = Math.hypot(dx, dy) || 1;
           tx = this.scopeX - (dx / dist) * this.scopeR;
           ty = this.scopeY - (dy / dist) * this.scopeR;
-        } else if (f.spawnPattern === "from-box-to-random-box-icon") {
-          const src =
-            f.sourceBox.iconPositions[
-              Math.floor(Math.random() * f.sourceBox.iconPositions.length)
-            ];
-          ox = src.cx;
-          oy = src.cy;
-          const targetBox =
-            f.targetBoxes[Math.floor(Math.random() * f.targetBoxes.length)];
+        } else if (f.spawnPattern === "from-scope-to-box") {
           const target =
-            targetBox.iconPositions[
-              Math.floor(Math.random() * targetBox.iconPositions.length)
-            ];
-          tx = target.cx;
-          ty = target.cy;
-        } else if (f.spawnPattern === "from-scope-to-random-box-icon") {
-          const targetBox =
-            f.targetBoxes[Math.floor(Math.random() * f.targetBoxes.length)];
-          const target =
-            targetBox.iconPositions[
-              Math.floor(Math.random() * targetBox.iconPositions.length)
+            f.targetBox.iconPositions[
+              Math.floor(Math.random() * f.targetBox.iconPositions.length)
             ];
           tx = target.cx;
           ty = target.cy;
@@ -291,109 +233,102 @@
       const totalH = 340;
       const yTop = ANIM_H / 2 - totalH / 2;
       const rightX = this.logicalW - BOX_MARGIN - BOX_W;
-      const processorsW = 180;
-      const processorsH = 80;
-      const processorsX = this.scopeX - processorsW / 2;
+      const rightBoxH = (totalH - BOX_GAP) / 2;
 
-      this.storefront = {
-        id: "storefront",
-        label: "storefront",
+      this.dashboard = {
+        id: "dashboard",
+        label: "dashboard",
         labelSide: "left",
         x: BOX_MARGIN,
         y: yTop,
         w: BOX_W,
         h: totalH,
-        icons: ["🛒", "🏪", "🛍️"],
+        icons: ["📊", "📈", "🖥️"],
       };
 
-      this.consumers = {
-        id: "consumers",
-        label: "consumers",
+      this.youtube = {
+        id: "youtube",
+        label: "youtube",
         labelSide: "right",
         x: rightX,
         y: yTop,
         w: BOX_W,
-        h: totalH,
-        icons: ["🖥️", "📊", "💁"],
-      };
-
-      this.processors = {
-        id: "processors",
-        label: "payment processors",
-        labelSide: "top",
-        x: processorsX,
-        y: yTop,
-        w: processorsW,
-        h: processorsH,
-        iconLayout: "horizontal",
-        icons: [
-          { glyph: String.fromCharCode(0xf429), color: "#635BFF" },
-          { glyph: String.fromCharCode(0xf1ed), color: "#003087" },
-        ],
+        h: rightBoxH,
+        icons: [""],
         iconFont: '400 36px "Font Awesome 6 Brands"',
+        iconColor: "#FF0000",
       };
 
+      this.gads = {
+        id: "gads",
+        label: "google ads",
+        labelSide: "right",
+        x: rightX,
+        y: yTop + rightBoxH + BOX_GAP,
+        w: BOX_W,
+        h: rightBoxH,
+        icons: [""],
+        iconFont: '400 36px "Font Awesome 6 Brands"',
+        iconColor: "#4285F4",
+      };
 
-      this.boxes = [this.storefront, this.consumers, this.processors];
+      this.boxes = [this.dashboard, this.youtube, this.gads];
 
       for (const box of this.boxes) {
         const n = box.icons.length;
-        if (box.iconLayout === "horizontal") {
-          const gap = (box.w - n * ICON_SIZE) / (n + 1);
-          const cy = box.y + box.h / 2;
-          const firstCx = box.x + gap + ICON_SIZE / 2;
-          box.iconPositions = box.icons.map((iconDef, i) => {
-            const glyph =
-              typeof iconDef === "string" ? iconDef : iconDef.glyph;
-            const color =
-              typeof iconDef === "string" ? null : iconDef.color;
-            return {
-              glyph,
-              color,
-              cx: firstCx + i * (ICON_SIZE + gap),
-              cy,
-            };
-          });
-        } else {
-          const gap = (box.h - n * ICON_SIZE) / (n + 1);
-          const cx = box.x + box.w / 2;
-          const firstCy = box.y + gap + ICON_SIZE / 2;
-          box.iconPositions = box.icons.map((iconDef, i) => {
-            const glyph =
-              typeof iconDef === "string" ? iconDef : iconDef.glyph;
-            const color =
-              typeof iconDef === "string" ? null : iconDef.color;
-            return {
-              glyph,
-              color,
-              cx,
-              cy: firstCy + i * (ICON_SIZE + gap),
-            };
-          });
-        }
+        const gap = (box.h - n * ICON_SIZE) / (n + 1);
+        const cx = box.x + box.w / 2;
+        const firstCy = box.y + gap + ICON_SIZE / 2;
+        box.iconPositions = box.icons.map((glyph, i) => ({
+          glyph,
+          cx,
+          cy: firstCy + i * (ICON_SIZE + gap),
+        }));
       }
 
-      const processorsBottom = this.processors.y + this.processors.h;
+      const ytY = this.youtube.y + this.youtube.h / 2;
+      const gadsY = this.gads.y + this.gads.h / 2;
 
       this.flows = [
         {
-          id: "processors-poll",
-          fromX: this.scopeX,
-          fromY: processorsBottom,
+          id: "yt-poll",
+          fromX: this.youtube.x,
+          fromY: ytY,
+          waypoints: [{ x: this.scopeX, y: ytY }],
           toX: this.scopeX,
           toY: this.scopeY - this.scopeR,
           rgb: "240, 200, 90",
           style: "linear",
           spawnInterval: 800,
-          travel: 1400,
+          travel: 1700,
           dots: [],
           nextSpawnAt: 0,
         },
         {
-          id: "nexus-consumers-poll",
-          fromX: this.scopeX + this.scopeR,
+          id: "gads-poll",
+          fromX: this.gads.x,
+          fromY: gadsY,
+          waypoints: [
+            { x: (this.gads.x + this.scopeX + this.scopeR) / 2, y: gadsY },
+            {
+              x: (this.gads.x + this.scopeX + this.scopeR) / 2,
+              y: this.scopeY,
+            },
+          ],
+          toX: this.scopeX + this.scopeR,
+          toY: this.scopeY,
+          rgb: "240, 200, 90",
+          style: "linear",
+          spawnInterval: 950,
+          travel: 1800,
+          dots: [],
+          nextSpawnAt: 0,
+        },
+        {
+          id: "scope-dashboard-poll",
+          fromX: this.scopeX - this.scopeR,
           fromY: this.scopeY,
-          toX: this.consumers.x,
+          toX: this.dashboard.x + this.dashboard.w,
           toY: this.scopeY,
           rgb: "240, 200, 90",
           style: "linear",
@@ -403,34 +338,22 @@
           nextSpawnAt: 0,
         },
         {
-          id: "consumer-op",
-          sourceBox: this.consumers,
+          id: "dashboard-instruction",
+          sourceBox: this.dashboard,
           spawnPattern: "from-box-to-scope",
-          rgb: "193, 72, 72",
-          style: "event",
-          spawnInterval: 3000,
-          travel: 800,
-          dots: [],
-          nextSpawnAt: 0,
-        },
-        {
-          id: "storefront-payment",
-          sourceBox: this.storefront,
-          targetBoxes: [this.processors],
-          spawnPattern: "from-box-to-random-box-icon",
           rgb: "92, 182, 224",
           style: "event",
-          spawnInterval: 1500,
-          travel: 900,
+          spawnInterval: ITEM_CYCLE_MS,
+          travel: 800,
           dots: [],
           nextSpawnAt: 0,
         },
       ];
 
-      this.opExecutionFlow = {
-        id: "op-execution",
-        targetBoxes: [this.processors],
-        spawnPattern: "from-scope-to-random-box-icon",
+      this.ruleUpdateFlow = {
+        id: "rule-update",
+        targetBox: this.gads,
+        spawnPattern: "from-scope-to-box",
         rgb: "193, 72, 72",
         style: "event",
         travel: 900,
@@ -438,18 +361,7 @@
         nextSpawnAt: 0,
         manual: true,
       };
-      this.flows.push(this.opExecutionFlow);
-
-      this.storefrontNexusFlow = {
-        id: "storefront-nexus",
-        rgb: "92, 182, 224",
-        style: "event",
-        travel: 850,
-        dots: [],
-        nextSpawnAt: 0,
-        manual: true,
-      };
-      this.flows.push(this.storefrontNexusFlow);
+      this.flows.push(this.ruleUpdateFlow);
 
       for (const f of this.flows) {
         if (f.style !== "linear") continue;
@@ -480,6 +392,11 @@
         w: LIST_W,
         h: LIST_H,
       };
+
+      this.blockedMeteorOrigin = {
+        x: this.list.x + this.list.w - 6,
+        y: this.list.y + this.list.h / 2,
+      };
     }
 
     draw() {
@@ -490,62 +407,122 @@
       this.drawHub();
       this.drawList();
       this.drawFlowDots();
-      this.drawOpHits();
-      this.drawSaleLabels();
-      this.drawCoinHits();
-      this.drawRefundLabels();
+      this.drawBlockHits();
       this.drawLegend();
     }
 
-    drawRefundLabels() {
+    drawBlockHits() {
       const ctx = this.ctx;
       ctx.save();
       ctx.font = '700 11px "DM Mono", monospace';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      for (const h of this.refundLabels) {
-        const age = (this.elapsed - h.time) / REFUND_LABEL_DURATION;
+      for (const h of this.blockHits) {
+        const age = (this.elapsed - h.time) / BLOCK_HIT_DURATION;
         if (age < 0 || age > 1) continue;
         const opacity = 1 - age;
         const labelY = h.y - 22 - age * 14;
         ctx.fillStyle = `rgba(193, 72, 72, ${opacity})`;
-        ctx.fillText("refund", h.x, labelY);
+        ctx.fillText("blocked", h.x, labelY);
       }
       ctx.restore();
     }
 
-    drawSaleLabels() {
+    drawList() {
       const ctx = this.ctx;
+      const { x, y, w, h } = this.list;
+      const focusIdx = Math.floor(this.elapsed / ITEM_CYCLE_MS);
+      const cycleAge = this.elapsed % ITEM_CYCLE_MS;
+      const scrollProgress =
+        cycleAge > ITEM_FOCUS_MS
+          ? (cycleAge - ITEM_FOCUS_MS) / ITEM_SCROLL_MS
+          : 0;
+      const focusY = y + h / 2;
+
       ctx.save();
-      ctx.font = '700 11px "DM Mono", monospace';
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      for (const h of this.saleLabels) {
-        const age = (this.elapsed - h.time) / SALE_LABEL_DURATION;
-        if (age < 0 || age > 1) continue;
-        const opacity = 1 - age;
-        const labelY = h.y - 22 - age * 14;
-        ctx.fillStyle = `rgba(45, 106, 80, ${opacity})`;
-        ctx.fillText("sale", h.x, labelY);
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+
+      for (let offsetInt = -2; offsetInt <= 2; offsetInt++) {
+        const idx = focusIdx + offsetInt;
+        if (idx < 0 || idx >= this.channelList.length) continue;
+        const item = this.channelList[idx];
+        const offset = offsetInt - scrollProgress;
+        const itemY = focusY + offset * ITEM_H;
+        const alpha = Math.max(0, Math.min(1, 2 - Math.abs(offset)));
+        if (alpha <= 0.01) continue;
+        const isFocused = item.status === "pending" && idx === focusIdx;
+        this.drawListItem(item, itemY, alpha, isFocused);
       }
+
       ctx.restore();
     }
 
-    drawCoinHits() {
+    drawListItem(item, cy, alpha, isFocused) {
       const ctx = this.ctx;
-      ctx.save();
-      ctx.font =
-        '20px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      for (const h of this.coinHits) {
-        const age = (this.elapsed - h.time) / COIN_LABEL_DURATION;
-        if (age < 0 || age > 1) continue;
-        const opacity = 1 - age;
-        const labelY = h.y - 22 - age * 14;
-        ctx.globalAlpha = opacity;
-        ctx.fillText("🪙", h.x, labelY);
+      const { x, w } = this.list;
+      const cardW = w - 12;
+      const cardH = ITEM_H - 4;
+      const cardX = x + 6;
+      const cardY = cy - cardH / 2;
+
+      let borderColor = COLORS.softBorder;
+      let bgColor = COLORS.surface;
+      let textColor = COLORS.muted;
+      let statusColor = COLORS.muted;
+      let statusText = "queued";
+      let lineWidth = 1;
+
+      if (item.status === "blocked") {
+        borderColor = "#c14848";
+        bgColor = "#fbe8e8";
+        textColor = "#c14848";
+        statusColor = "#c14848";
+        statusText = "✗ block";
+        lineWidth = 1.5;
+      } else if (item.status === "kept") {
+        borderColor = "#2d6a50";
+        bgColor = "#e3efe9";
+        textColor = "#2d6a50";
+        statusColor = "#2d6a50";
+        statusText = "✓ keep";
+        lineWidth = 1.5;
+      } else if (isFocused) {
+        borderColor = COLORS.pulseRing;
+        bgColor = "#eaf6fb";
+        textColor = COLORS.text;
+        statusColor = COLORS.pulseRing;
+        statusText = "checking…";
+        lineWidth = 1.75;
       }
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(cardX, cardY, cardW, cardH, 6);
+      } else {
+        ctx.rect(cardX, cardY, cardW, cardH);
+      }
+      ctx.fillStyle = bgColor;
+      ctx.fill();
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = lineWidth;
+      ctx.stroke();
+
+      ctx.font = '600 11px "DM Mono", monospace';
+      ctx.fillStyle = textColor;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(item.name, cardX + 9, cy);
+
+      ctx.font = '600 9px "DM Mono", monospace';
+      ctx.fillStyle = statusColor;
+      ctx.textAlign = "right";
+      ctx.fillText(statusText, cardX + cardW - 9, cy);
+
       ctx.restore();
     }
 
@@ -626,10 +603,10 @@
       ctx.font =
         box.iconFont ||
         '24px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+      ctx.fillStyle = box.iconColor || COLORS.text;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       for (const icon of box.iconPositions) {
-        ctx.fillStyle = icon.color || box.iconColor || COLORS.text;
         ctx.fillText(icon.glyph, icon.cx, icon.cy);
       }
       ctx.restore();
@@ -638,33 +615,18 @@
       ctx.font = labelFont;
       const textW = ctx.measureText(box.label).width;
       const padding = 6;
+      const labelX = box.labelSide === "left" ? x : x + w;
 
       ctx.save();
-      if (box.labelSide === "top") {
-        ctx.fillStyle = COLORS.surface;
-        ctx.fillRect(
-          x + w / 2 - textW / 2 - padding,
-          y - 8,
-          textW + padding * 2,
-          16,
-        );
-        ctx.fillStyle = COLORS.muted;
-        ctx.font = labelFont;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(box.label, x + w / 2, y);
-      } else {
-        const labelX = box.labelSide === "left" ? x : x + w;
-        ctx.translate(labelX, y + h / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillStyle = COLORS.surface;
-        ctx.fillRect(-textW / 2 - padding, -8, textW + padding * 2, 16);
-        ctx.fillStyle = COLORS.muted;
-        ctx.font = labelFont;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(box.label, 0, 0);
-      }
+      ctx.translate(labelX, y + h / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = COLORS.surface;
+      ctx.fillRect(-textW / 2 - padding, -8, textW + padding * 2, 16);
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = labelFont;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(box.label, 0, 0);
       ctx.restore();
     }
 
@@ -723,129 +685,7 @@
       ctx.font = '700 18px "DM Mono", monospace';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("NEXUS", this.scopeX, this.scopeY + 1);
-      ctx.restore();
-    }
-
-    drawList() {
-      const ctx = this.ctx;
-      const { x, y, w, h } = this.list;
-      const focusIdx = Math.floor(this.elapsed / ITEM_CYCLE_MS);
-      const cycleAge = this.elapsed % ITEM_CYCLE_MS;
-      const scrollProgress =
-        cycleAge > ITEM_FOCUS_MS
-          ? (cycleAge - ITEM_FOCUS_MS) / ITEM_SCROLL_MS
-          : 0;
-      const focusY = y + h / 2;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(x, y, w, h);
-      ctx.clip();
-
-      for (let offsetInt = -2; offsetInt <= 2; offsetInt++) {
-        const idx = focusIdx + offsetInt;
-        if (idx < 0 || idx >= this.paymentList.length) continue;
-        const item = this.paymentList[idx];
-        const offset = offsetInt - scrollProgress;
-        const itemY = focusY + offset * ITEM_H;
-        const alpha = Math.max(0, Math.min(1, 2 - Math.abs(offset)));
-        if (alpha <= 0.01) continue;
-        const isFocused = item.status === "pending" && idx === focusIdx;
-        this.drawListItem(item, itemY, alpha, isFocused);
-      }
-
-      ctx.restore();
-    }
-
-    drawListItem(item, cy, alpha, isFocused) {
-      const ctx = this.ctx;
-      const { x, w } = this.list;
-      const cardW = w - 12;
-      const cardH = ITEM_H - 4;
-      const cardX = x + 6;
-      const cardY = cy - cardH / 2;
-
-      let borderColor = COLORS.softBorder;
-      let bgColor = COLORS.surface;
-      let textColor = COLORS.muted;
-      let statusColor = COLORS.muted;
-      let statusText = "queued";
-      let lineWidth = 1;
-
-      if (item.status === "failed") {
-        borderColor = "#c14848";
-        bgColor = "#fbe8e8";
-        textColor = "#c14848";
-        statusColor = "#c14848";
-        statusText = "✗ failed";
-        lineWidth = 1.5;
-      } else if (item.status === "consolidated") {
-        borderColor = "#2d6a50";
-        bgColor = "#e3efe9";
-        textColor = "#2d6a50";
-        statusColor = "#2d6a50";
-        statusText = "✓ consolidated";
-        lineWidth = 1.5;
-      } else if (isFocused) {
-        borderColor = COLORS.pulseRing;
-        bgColor = "#eaf6fb";
-        textColor = COLORS.text;
-        statusColor = COLORS.pulseRing;
-        statusText = "consolidating…";
-        lineWidth = 1.75;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = alpha;
-
-      ctx.beginPath();
-      if (typeof ctx.roundRect === "function") {
-        ctx.roundRect(cardX, cardY, cardW, cardH, 6);
-      } else {
-        ctx.rect(cardX, cardY, cardW, cardH);
-      }
-      ctx.fillStyle = bgColor;
-      ctx.fill();
-      ctx.strokeStyle = borderColor;
-      ctx.lineWidth = lineWidth;
-      ctx.stroke();
-
-      ctx.font = '600 11px "DM Mono", monospace';
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-
-      const amountText = `${item.amount}  `;
-      ctx.fillStyle = textColor;
-      ctx.fillText(amountText, cardX + 9, cy);
-      const amountW = ctx.measureText(amountText).width;
-
-      ctx.fillStyle = PROVIDER_COLOR[item.provider] || textColor;
-      ctx.fillText(item.provider, cardX + 9 + amountW, cy);
-
-      ctx.font = '600 9px "DM Mono", monospace';
-      ctx.fillStyle = statusColor;
-      ctx.textAlign = "right";
-      ctx.fillText(statusText, cardX + cardW - 9, cy);
-
-      ctx.restore();
-    }
-
-    drawOpHits() {
-      const ctx = this.ctx;
-      ctx.save();
-      ctx.font =
-        '20px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      for (const h of this.opHits) {
-        const age = (this.elapsed - h.time) / OP_HIT_DURATION;
-        if (age < 0 || age > 1) continue;
-        const opacity = 1 - age;
-        const labelY = h.y - 22 - age * 14;
-        ctx.globalAlpha = opacity;
-        ctx.fillText("💸", h.x, labelY);
-      }
+      ctx.fillText("SCOPE", this.scopeX, this.scopeY + 1);
       ctx.restore();
     }
 
@@ -855,8 +695,8 @@
       const cy = ANIM_H + (this.logicalH - ANIM_H) / 2;
       const items = [
         { type: "polling", label: "Polling" },
-        { type: "meteor-blue", label: "Payment" },
-        { type: "meteor-red", label: "Refund" },
+        { type: "meteor-blue", label: "Instruction" },
+        { type: "meteor-red", label: "Rule update" },
       ];
       const slotW = this.logicalW / items.length;
       const sampleW = 32;
@@ -922,7 +762,7 @@
   function init() {
     const canvas = document.getElementById("anim-hero");
     if (!canvas) return;
-    const sim = new NexusHero(canvas);
+    const sim = new ScopeHero(canvas);
 
     const replayBtn = document.getElementById("anim-replay");
     if (replayBtn) {

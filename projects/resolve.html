@@ -56,13 +56,13 @@
     </nav>
 
     <div class="page">
-      <article class="proj-article fade-up d1">
-        <nav class="proj-article-breadcrumb">
-          <a href="../projects.html">← Projects</a>
-          <span class="sep">/</span>
-          <span class="current">Resolve</span>
-        </nav>
+      <div class="proj-breadcrumb fade-up d1">
+        <a href="../projects.html">← Projects</a>
+        <span class="sep">/</span>
+        <span class="current">Resolve</span>
+      </div>
 
+      <article class="proj-article fade-up d2">
         <header class="proj-article-header">
           <h1 class="proj-article-title">Resolve</h1>
           <div class="proj-article-badges">
@@ -72,7 +72,7 @@
           </div>
         </header>
 
-        <section class="proj-section">
+        <div class="proj-section">
           <h2>Overview</h2>
           <p>
             Resolve is a
@@ -90,28 +90,27 @@
             teams regardless of which provider processed the original
             transaction.
           </p>
-        </section>
+        </div>
 
         <section class="proj-section anim-section">
           <div class="anim-hero">
+            <div class="anim-hero-header">
+              <span class="anim-hero-label">Customer support ticket lifecycle &amp; review flow</span>
+            </div>
             <canvas
               class="anim-hero-canvas"
               id="anim-hero"
               width="720"
-              height="380"
+              height="440"
               aria-label="Resolve system animation: CS agents send tickets to the Resolve hub, which routes them to supervisors for review; approved tickets return to Resolve and dispatch to external Order and Payment services, which respond back to Resolve"
             ></canvas>
             <div class="anim-hero-footer">
-              <div class="anim-counter">
-                <span class="anim-counter-num" id="anim-counter">0</span>
-                <span class="anim-counter-label">tickets resolved</span>
-              </div>
-              <button class="btn-ghost anim-btn" id="anim-replay" type="button">↺ Replay</button>
+              <button class="btn-ghost anim-btn anim-btn--full" id="anim-replay" type="button">↺ Replay</button>
             </div>
           </div>
         </section>
 
-        <section class="proj-section">
+        <div class="proj-section">
           <h2>Features</h2>
           <ul class="proj-features">
             <li>
@@ -143,9 +142,9 @@
               failures
             </li>
           </ul>
-        </section>
+        </div>
 
-        <section class="proj-section">
+        <div class="proj-section">
           <h2>Architecture</h2>
           <p>
             Part of a broader microservices ecosystem. Resolve coordinates
@@ -187,7 +186,7 @@
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
         <section class="proj-section">
           <h2>Tech Stack</h2>
