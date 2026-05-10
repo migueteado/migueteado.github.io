@@ -152,10 +152,30 @@
         flex-direction: column;
         gap: 0.5rem;
       }
+      .pc-emoji {
+        font-size: 1.4rem;
+        line-height: 1;
+        width: 2.2rem;
+        height: 2.2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        flex-shrink: 0;
+      }
+      .pc-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        min-width: 0;
+      }
       .pc-meta-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 0.5rem;
       }
       .pc-name {
         font-weight: 700;
@@ -164,11 +184,19 @@
         letter-spacing: -0.01em;
         transition: color 0.2s;
       }
+      .pc-badges {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+      }
       .pc-badge {
         font-family: "DM Mono", monospace;
         font-size: 0.63rem;
         color: var(--accent3);
         letter-spacing: 0.06em;
+      }
+      .pc-badge.live {
+        color: var(--accent2);
       }
       .pc-desc {
         color: var(--muted);
@@ -195,6 +223,24 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--muted);
+      }
+      .pc-cta {
+        font-family: "DM Mono", monospace;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+        padding: 0.4rem 0.9rem;
+        border: 1px solid var(--accent);
+        border-radius: 999px;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .project-card:hover .pc-cta {
+        background: var(--accent);
+        color: var(--surface);
       }
       .pc-link {
         font-size: 0.82rem;
@@ -318,8 +364,9 @@
           What I've <span class="gradient-text">Built</span>
         </h1>
         <p class="page-subtitle fade-up d3">
-          A selection of backend systems, APIs, infrastructure tooling, and side
-          projects. Each one taught me something worth keeping.
+          Backend systems and microservices I've designed and built — each
+          card opens to a <strong>live interactive diagram</strong> showing
+          how the system works in motion.
         </p>
       </div>
 
@@ -358,7 +405,10 @@
           >
             <div class="pc-body">
               <div class="pc-meta-row">
-                <div class="pc-name">Dispatch</div>
+                <div class="pc-title-group">
+                  <div class="pc-emoji">📦</div>
+                  <div class="pc-name">Dispatch</div>
+                </div>
                 <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
@@ -375,7 +425,7 @@
             </div>
             <div class="pc-footer">
               <div class="pc-type">Full Stack · Fulfillment</div>
-              <div class="pc-link">View Project ↗</div>
+              <div class="pc-cta">Explore →</div>
             </div>
           </a>
 
@@ -386,7 +436,10 @@
           >
             <div class="pc-body">
               <div class="pc-meta-row">
-                <div class="pc-name">Resolve</div>
+                <div class="pc-title-group">
+                  <div class="pc-emoji">🎫</div>
+                  <div class="pc-name">Resolve</div>
+                </div>
                 <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
@@ -403,7 +456,7 @@
             </div>
             <div class="pc-footer">
               <div class="pc-type">Full Stack · Support Ops</div>
-              <div class="pc-link">View Project ↗</div>
+              <div class="pc-cta">Explore →</div>
             </div>
           </a>
 
@@ -414,7 +467,10 @@
           >
             <div class="pc-body">
               <div class="pc-meta-row">
-                <div class="pc-name">Scope</div>
+                <div class="pc-title-group">
+                  <div class="pc-emoji">🎯</div>
+                  <div class="pc-name">Scope</div>
+                </div>
                 <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
@@ -431,7 +487,7 @@
             </div>
             <div class="pc-footer">
               <div class="pc-type">Full Stack · Marketing</div>
-              <div class="pc-link">View Project ↗</div>
+              <div class="pc-cta">Explore →</div>
             </div>
           </a>
 
@@ -442,7 +498,10 @@
           >
             <div class="pc-body">
               <div class="pc-meta-row">
-                <div class="pc-name">Shield</div>
+                <div class="pc-title-group">
+                  <div class="pc-emoji">🛡️</div>
+                  <div class="pc-name">Shield</div>
+                </div>
                 <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
@@ -459,14 +518,17 @@
             </div>
             <div class="pc-footer">
               <div class="pc-type">Full Stack · Payments</div>
-              <div class="pc-link">View Project ↗</div>
+              <div class="pc-cta">Explore →</div>
             </div>
           </a>
 
           <a href="projects/nexus.html" class="project-card" data-cat="backend">
             <div class="pc-body">
               <div class="pc-meta-row">
-                <div class="pc-name">Nexus</div>
+                <div class="pc-title-group">
+                  <div class="pc-emoji">💳</div>
+                  <div class="pc-name">Nexus</div>
+                </div>
                 <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
@@ -483,14 +545,17 @@
             </div>
             <div class="pc-footer">
               <div class="pc-type">Backend · Payments</div>
-              <div class="pc-link">View Project ↗</div>
+              <div class="pc-cta">Explore →</div>
             </div>
           </a>
 
           <a href="projects/pulse.html" class="project-card" data-cat="backend">
             <div class="pc-body">
               <div class="pc-meta-row">
-                <div class="pc-name">Pulse</div>
+                <div class="pc-title-group">
+                  <div class="pc-emoji">💗</div>
+                  <div class="pc-name">Pulse</div>
+                </div>
                 <div class="pc-badge">Production</div>
               </div>
               <div class="pc-desc">
@@ -507,7 +572,7 @@
             </div>
             <div class="pc-footer">
               <div class="pc-type">Backend · E-commerce</div>
-              <div class="pc-link">View Project ↗</div>
+              <div class="pc-cta">Explore →</div>
             </div>
           </a>
         </div>
@@ -593,6 +658,12 @@
               <span class="tag">AWS</span>
               <span class="tag">GCP</span>
               <span class="tag">Terraform</span>
+            </div>
+          </div>
+          <div class="skill-card fade-up d2">
+            <div class="skill-cat">AI Tooling</div>
+            <div class="skill-tags">
+              <span class="tag hot">Claude Code</span>
             </div>
           </div>
         </div>
