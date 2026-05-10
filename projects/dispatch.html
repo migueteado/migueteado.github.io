@@ -62,162 +62,166 @@
         <span class="current">Dispatch</span>
       </div>
 
-      <div class="proj-layout">
-        <!-- MAIN CONTENT -->
-        <main class="proj-main fade-up d2">
-          <h1 class="proj-title">Dispatch</h1>
-
-          <div class="proj-section">
-            <h2>Overview</h2>
-            <p>
-              Dispatch is a
-              <strong
-                >full-stack fulfillment routing and warehouse assignment
-                system</strong
-              >
-              built to automate the conversion of incoming orders into
-              fulfillable parcels. It selects the optimal warehouse for each
-              parcel based on real-time stock availability, shipping cost, and
-              order priority — then tracks each shipment through to delivery via
-              third-party tracking integrations.
-            </p>
-            <p>
-              The system runs as part of a broader microservices platform and
-              handles high-volume concurrent queue processing while maintaining
-              strict stock consistency across multiple warehouses. It replaced a
-              largely manual fulfillment workflow and scaled to 200,000+ parcels
-              per month.
-            </p>
+      <article class="proj-article fade-up d2">
+        <header class="proj-article-header">
+          <h1 class="proj-article-title">Dispatch</h1>
+          <div class="proj-article-badges">
+            <span class="proj-article-badge accent">Full Stack</span>
+            <span class="proj-article-badge">Production</span>
+            <span class="proj-article-badge">Microservice</span>
           </div>
+        </header>
 
-          <div class="proj-section">
-            <h2>Features</h2>
-            <ul class="proj-features">
-              <li>
-                Order priority-based queue — ensures high-value and
-                time-sensitive orders are processed first
-              </li>
-              <li>
-                Warehouse placement engine — selects the optimal warehouse per
-                parcel based on stock availability and shipping cost
-              </li>
-              <li>
-                Stock forecasting and cross-warehouse synchronization to prevent
-                overselling
-              </li>
-              <li>
-                Per-parcel and per-order cost calculation for operations
-                reporting
-              </li>
-              <li>
-                API and internal UI for manual operations and fulfillment
-                adjustments by logistics teams
-              </li>
-              <li>
-                Real-time tracking updates via third-party tracking system
-                integrations
-              </li>
-              <li>
-                Automated concurrent queue processing to handle high order
-                volumes while keeping stock consistent
-              </li>
-            </ul>
+        <div class="proj-section">
+          <h2>Overview</h2>
+          <p>
+            Dispatch is a
+            <strong>full-stack fulfillment routing and warehouse assignment system</strong>
+            built to automate the conversion of incoming orders into
+            fulfillable parcels. It selects the optimal warehouse for each
+            parcel based on real-time stock availability, shipping cost, and
+            order priority — then tracks each shipment through to delivery via
+            third-party tracking integrations.
+          </p>
+          <p>
+            The system runs as part of a broader microservices platform and
+            handles high-volume concurrent queue processing while maintaining
+            strict stock consistency across multiple warehouses. It replaced a
+            largely manual fulfillment workflow and scaled to 200,000+ parcels
+            per month.
+          </p>
+        </div>
+
+        <section class="proj-section anim-section">
+          <div class="anim-hero">
+            <div class="anim-hero-header">
+              <span class="anim-hero-label">Order routing &amp; warehouse fulfillment flow</span>
+            </div>
+            <canvas
+              class="anim-hero-canvas"
+              id="anim-hero"
+              width="720"
+              height="440"
+              aria-label="Dispatch system animation showing orders flowing from a queue through a central dispatcher to multiple warehouses"
+            ></canvas>
+            <div class="anim-hero-footer">
+              <button class="btn-ghost anim-btn anim-btn--full" id="anim-replay" type="button">↺ Replay</button>
+            </div>
           </div>
+        </section>
 
-          <div class="proj-section">
-            <h2>Architecture</h2>
-            <p>
-              Part of a broader microservices ecosystem. Dispatch receives order
-              events from upstream services and emits parcel and tracking events
-              consumed by other services in the platform.
-            </p>
-            <div class="proj-arch" style="margin-top: 1.25rem">
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Frontend</div>
-                <div class="proj-arch-val">
-                  Internal operations UI for logistics and warehouse teams to
-                  handle manual overrides, monitor queue status, and adjust
-                  assignments.
-                </div>
+        <div class="proj-section">
+          <h2>Features</h2>
+          <ul class="proj-features">
+            <li>
+              Order priority-based queue — ensures high-value and
+              time-sensitive orders are processed first
+            </li>
+            <li>
+              Warehouse placement engine — selects the optimal warehouse per
+              parcel based on stock availability and shipping cost
+            </li>
+            <li>
+              Stock forecasting and cross-warehouse synchronization to prevent
+              overselling
+            </li>
+            <li>
+              Per-parcel and per-order cost calculation for operations
+              reporting
+            </li>
+            <li>
+              API and internal UI for manual operations and fulfillment
+              adjustments by logistics teams
+            </li>
+            <li>
+              Real-time tracking updates via third-party tracking system
+              integrations
+            </li>
+            <li>
+              Automated concurrent queue processing to handle high order
+              volumes while keeping stock consistent
+            </li>
+          </ul>
+        </div>
+
+        <div class="proj-section">
+          <h2>Architecture</h2>
+          <p>
+            Part of a broader microservices ecosystem. Dispatch receives order
+            events from upstream services and emits parcel and tracking events
+            consumed by other services in the platform.
+          </p>
+          <div class="proj-arch" style="margin-top: 1.25rem">
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Frontend</div>
+              <div class="proj-arch-val">
+                Internal operations UI for logistics and warehouse teams to
+                handle manual overrides, monitor queue status, and adjust
+                assignments.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">API</div>
-                <div class="proj-arch-val">
-                  Receives requests from the frontend and upstream services.
-                  Exposes endpoints for order ingestion, stock queries, and
-                  manual operations.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">API</div>
+              <div class="proj-arch-val">
+                Receives requests from the frontend and upstream services.
+                Exposes endpoints for order ingestion, stock queries, and
+                manual operations.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Workers</div>
-                <div class="proj-arch-val">
-                  Inngest functions handle the core routing logic asynchronously
-                  — warehouse selection, cost calculation, and tracking update
-                  ingestion — with retry logic and concurrency controls.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Workers</div>
+              <div class="proj-arch-val">
+                Inngest functions handle the core routing logic asynchronously
+                — warehouse selection, cost calculation, and tracking update
+                ingestion — with retry logic and concurrency controls.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Database</div>
-                <div class="proj-arch-val">
-                  PostgreSQL stores orders, parcels, warehouse stock levels,
-                  shipping costs, and tracking events with transactional
-                  guarantees for stock consistency.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Database</div>
+              <div class="proj-arch-val">
+                PostgreSQL stores orders, parcels, warehouse stock levels,
+                shipping costs, and tracking events with transactional
+                guarantees for stock consistency.
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="proj-nav">
-            <a href="../projects.html">← All Projects</a>
-            <a href="resolve.html">Resolve →</a>
-          </div>
-        </main>
-
-        <!-- SIDEBAR -->
-        <aside class="proj-sidebar fade-up d3">
-          <div class="proj-sidebar-card">
-            <div class="proj-sidebar-top">
-              <div class="proj-sidebar-name">Dispatch</div>
-              <div class="proj-sidebar-badges">
-                <span class="proj-sidebar-badge accent">Full Stack</span>
-                <span class="proj-sidebar-badge">Production</span>
-                <span class="proj-sidebar-badge">Microservice</span>
+        <section class="proj-section">
+          <h2>Tech Stack</h2>
+          <div class="tech-stack">
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Frontend</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">Next.js</span>
+                <span class="tag hot">React</span>
+                <span class="tag">Tailwind CSS</span>
+                <span class="tag">shadcn/ui</span>
               </div>
             </div>
-            <div class="proj-sidebar-body">
-              <p class="proj-sidebar-desc">
-                Fulfillment routing, warehouse assignment, and parcel tracking —
-                automating the full order-to-shipment lifecycle at 200K+
-                parcels/month.
-              </p>
-              <div>
-                <div class="proj-sidebar-section-label">Frontend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">Next.js</span>
-                  <span class="tag hot">React</span>
-                  <span class="tag">Tailwind CSS</span>
-                  <span class="tag">shadcn/ui</span>
-                </div>
-              </div>
-              <div>
-                <div class="proj-sidebar-section-label">Backend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">TypeScript</span>
-                  <span class="tag hot">Bun</span>
-                  <span class="tag hot">Elysia.js</span>
-                  <span class="tag hot">Inngest</span>
-                  <span class="tag">PostgreSQL</span>
-                  <span class="tag">Docker</span>
-                  <span class="tag">GCP</span>
-                </div>
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Backend</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">TypeScript</span>
+                <span class="tag hot">Bun</span>
+                <span class="tag hot">Elysia.js</span>
+                <span class="tag hot">Inngest</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GCP</span>
               </div>
             </div>
           </div>
-        </aside>
-      </div>
+        </section>
+
+        <div class="proj-nav">
+          <a href="../projects.html">← All Projects</a>
+          <a href="resolve.html">Resolve →</a>
+        </div>
+      </article>
     </div>
 
-        <footer>
+    <footer>
       <div class="footer-inner">
         <div class="footer-col">© 2026 Miguel Villalobos</div>
         <div class="footer-col footer-col--center">Built with HTML · CSS · JS · ❤️</div>
@@ -234,5 +238,6 @@
           ),
         );
     </script>
+    <script src="dispatch.js"></script>
   </body>
 </html>

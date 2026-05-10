@@ -62,141 +62,148 @@
         <span class="current">Nexus</span>
       </div>
 
-      <div class="proj-layout">
-        <!-- MAIN CONTENT -->
-        <main class="proj-main fade-up d2">
-          <h1 class="proj-title">Nexus</h1>
-
-          <div class="proj-section">
-            <h2>Overview</h2>
-            <p>
-              Nexus is a
-              <strong>backend payment processing orchestrator</strong> that
-              abstracts over multiple payment providers — Stripe, PayPal,
-              Klarna, Primer, and Adyen. It normalizes payment data into a
-              unified model and exposes a single consistent API that the rest of
-              the platform uses regardless of which provider processed a given
-              transaction.
-            </p>
-            <p>
-              Other services — like Resolve for refunds and Shield for disputes
-              — delegate all payment operations to Nexus, ensuring
-              provider-specific logic is centralized in one place. Asynchronous
-              workers handle operations with retry logic and fallbacks to
-              maintain reliability under provider-side failures.
-            </p>
+      <article class="proj-article fade-up d2">
+        <header class="proj-article-header">
+          <h1 class="proj-article-title">Nexus</h1>
+          <div class="proj-article-badges">
+            <span class="proj-article-badge accent">Backend</span>
+            <span class="proj-article-badge">Production</span>
+            <span class="proj-article-badge">Microservice</span>
           </div>
+        </header>
 
-          <div class="proj-section">
-            <h2>Features</h2>
-            <ul class="proj-features">
-              <li>
-                Unified API for receiving payment operation requests from other
-                internal services
-              </li>
-              <li>
-                Normalized payment data model across Stripe, PayPal, Klarna,
-                Primer, and Adyen
-              </li>
-              <li>
-                Asynchronous workers with retry logic and fallbacks for reliable
-                operation handling
-              </li>
-              <li>
-                Refund and dispute operations routed to the correct provider per
-                transaction
-              </li>
-            </ul>
+        <div class="proj-section">
+          <h2>Overview</h2>
+          <p>
+            Nexus is a
+            <strong>backend payment processing orchestrator</strong> that
+            abstracts over multiple payment providers — Stripe, PayPal,
+            Klarna, Primer, and Adyen. It normalizes payment data into a
+            unified model and exposes a single consistent API that the rest of
+            the platform uses regardless of which provider processed a given
+            transaction.
+          </p>
+          <p>
+            Other services — like Resolve for refunds and Shield for disputes
+            — delegate all payment operations to Nexus, ensuring
+            provider-specific logic is centralized in one place. Asynchronous
+            workers handle operations with retry logic and fallbacks to
+            maintain reliability under provider-side failures.
+          </p>
+        </div>
+
+        <section class="proj-section anim-section">
+          <div class="anim-hero">
+            <div class="anim-hero-header">
+              <span class="anim-hero-label">Payment orchestration &amp; provider routing flow</span>
+            </div>
+            <canvas
+              class="anim-hero-canvas"
+              id="anim-hero"
+              width="720"
+              height="440"
+              aria-label="Nexus system animation: internal services delegate payment operations to Nexus, which normalizes the request and routes it to the correct provider integration"
+            ></canvas>
+            <div class="anim-hero-footer">
+              <button class="btn-ghost anim-btn anim-btn--full" id="anim-replay" type="button">↺ Replay</button>
+            </div>
           </div>
+        </section>
 
-          <div class="proj-section">
-            <h2>Architecture</h2>
-            <p>
-              Part of a broader microservices ecosystem. Nexus acts as the
-              payment abstraction layer — consumed by services like Resolve and
-              Shield to execute financial operations without needing to know
-              which provider handled the original transaction.
-            </p>
-            <div class="proj-arch" style="margin-top: 1.25rem">
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">API</div>
-                <div class="proj-arch-val">
-                  Exposes a provider-agnostic API for payment queries and
-                  operations. Routes requests to the correct provider
-                  integration based on transaction metadata.
-                </div>
+        <div class="proj-section">
+          <h2>Features</h2>
+          <ul class="proj-features">
+            <li>
+              Unified API for receiving payment operation requests from other
+              internal services
+            </li>
+            <li>
+              Normalized payment data model across Stripe, PayPal, Klarna,
+              Primer, and Adyen
+            </li>
+            <li>
+              Asynchronous workers with retry logic and fallbacks for reliable
+              operation handling
+            </li>
+            <li>
+              Refund and dispute operations routed to the correct provider per
+              transaction
+            </li>
+          </ul>
+        </div>
+
+        <div class="proj-section">
+          <h2>Architecture</h2>
+          <p>
+            Part of a broader microservices ecosystem. Nexus acts as the
+            payment abstraction layer — consumed by services like Resolve and
+            Shield to execute financial operations without needing to know
+            which provider handled the original transaction.
+          </p>
+          <div class="proj-arch" style="margin-top: 1.25rem">
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">API</div>
+              <div class="proj-arch-val">
+                Exposes a provider-agnostic API for payment queries and
+                operations. Routes requests to the correct provider
+                integration based on transaction metadata.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Workers</div>
-                <div class="proj-arch-val">
-                  Inngest functions execute payment operations asynchronously
-                  with retry logic, exponential backoff, and fallback handling
-                  for provider-side failures.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Workers</div>
+              <div class="proj-arch-val">
+                Inngest functions execute payment operations asynchronously
+                with retry logic, exponential backoff, and fallback handling
+                for provider-side failures.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Database</div>
-                <div class="proj-arch-val">
-                  PostgreSQL stores normalized payment records, operation logs,
-                  and provider mappings — serving as the source of truth for all
-                  payment state across the platform.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Database</div>
+              <div class="proj-arch-val">
+                PostgreSQL stores normalized payment records, operation logs,
+                and provider mappings — serving as the source of truth for all
+                payment state across the platform.
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="proj-nav">
-            <a href="shield.html">← Shield</a>
-            <a href="pulse.html">Pulse →</a>
-          </div>
-        </main>
-
-        <!-- SIDEBAR -->
-        <aside class="proj-sidebar fade-up d3">
-          <div class="proj-sidebar-card">
-            <div class="proj-sidebar-top">
-              <div class="proj-sidebar-name">Nexus</div>
-              <div class="proj-sidebar-badges">
-                <span class="proj-sidebar-badge accent">Backend</span>
-                <span class="proj-sidebar-badge">Production</span>
-                <span class="proj-sidebar-badge">Microservice</span>
+        <section class="proj-section">
+          <h2>Tech Stack</h2>
+          <div class="tech-stack">
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Backend</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">TypeScript</span>
+                <span class="tag hot">Bun</span>
+                <span class="tag hot">Elysia.js</span>
+                <span class="tag hot">Inngest</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GCP</span>
               </div>
             </div>
-            <div class="proj-sidebar-body">
-              <p class="proj-sidebar-desc">
-                Payment orchestration layer across Stripe, PayPal, Klarna,
-                Adyen, and Primer — normalizing payment data and exposing a
-                unified API to the rest of the platform.
-              </p>
-              <div>
-                <div class="proj-sidebar-section-label">Backend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">TypeScript</span>
-                  <span class="tag hot">Bun</span>
-                  <span class="tag hot">Elysia.js</span>
-                  <span class="tag hot">Inngest</span>
-                  <span class="tag">PostgreSQL</span>
-                  <span class="tag">Docker</span>
-                  <span class="tag">GCP</span>
-                </div>
-              </div>
-              <div>
-                <div class="proj-sidebar-section-label">Payments</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">Stripe</span>
-                  <span class="tag hot">PayPal</span>
-                  <span class="tag">Klarna</span>
-                  <span class="tag">Adyen</span>
-                  <span class="tag">Primer</span>
-                </div>
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Payments</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">Stripe</span>
+                <span class="tag hot">PayPal</span>
+                <span class="tag">Klarna</span>
+                <span class="tag">Adyen</span>
+                <span class="tag">Primer</span>
               </div>
             </div>
           </div>
-        </aside>
-      </div>
+        </section>
+
+        <div class="proj-nav">
+          <a href="shield.html">← Shield</a>
+          <a href="pulse.html">Pulse →</a>
+        </div>
+      </article>
     </div>
 
-        <footer>
+    <footer>
       <div class="footer-inner">
         <div class="footer-col">© 2026 Miguel Villalobos</div>
         <div class="footer-col footer-col--center">Built with HTML · CSS · JS · ❤️</div>
@@ -213,5 +220,6 @@
           ),
         );
     </script>
+    <script src="nexus.js"></script>
   </body>
 </html>

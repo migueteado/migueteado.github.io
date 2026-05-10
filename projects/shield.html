@@ -62,147 +62,154 @@
         <span class="current">Shield</span>
       </div>
 
-      <div class="proj-layout">
-        <!-- MAIN CONTENT -->
-        <main class="proj-main fade-up d2">
-          <h1 class="proj-title">Shield</h1>
-
-          <div class="proj-section">
-            <h2>Overview</h2>
-            <p>
-              Shield is a
-              <strong>full-stack dispute handling application</strong> that
-              integrates with payment providers to receive dispute
-              notifications, automatically collect relevant evidence, and submit
-              structured response documents to contest chargebacks on behalf of
-              the business.
-            </p>
-            <p>
-              The system reduces the manual effort involved in chargeback
-              responses — evidence is collected automatically from order
-              history, fulfillment records, and customer data, then surfaced in
-              a WYSIWYG editor where teams can review and finalize documents
-              before submission.
-            </p>
+      <article class="proj-article fade-up d2">
+        <header class="proj-article-header">
+          <h1 class="proj-article-title">Shield</h1>
+          <div class="proj-article-badges">
+            <span class="proj-article-badge accent">Full Stack</span>
+            <span class="proj-article-badge">Production</span>
+            <span class="proj-article-badge">Microservice</span>
           </div>
+        </header>
 
-          <div class="proj-section">
-            <h2>Features</h2>
-            <ul class="proj-features">
-              <li>
-                API for receiving operations requests from internal teams and
-                payment provider webhooks
-              </li>
-              <li>
-                Asynchronous workers to collect evidence from order history,
-                fulfillment records, and customer data
-              </li>
-              <li>
-                Internal UI to review collected evidence and submit final
-                dispute documents
-              </li>
-              <li>
-                PDF generator and WYSIWYG editor for building structured
-                chargeback response documents
-              </li>
-            </ul>
+        <div class="proj-section">
+          <h2>Overview</h2>
+          <p>
+            Shield is a
+            <strong>full-stack dispute handling application</strong> that
+            integrates with payment providers to receive dispute
+            notifications, automatically collect relevant evidence, and submit
+            structured response documents to contest chargebacks on behalf of
+            the business.
+          </p>
+          <p>
+            The system reduces the manual effort involved in chargeback
+            responses — evidence is collected automatically from order
+            history, fulfillment records, and customer data, then surfaced in
+            a WYSIWYG editor where teams can review and finalize documents
+            before submission.
+          </p>
+        </div>
+
+        <section class="proj-section anim-section">
+          <div class="anim-hero">
+            <div class="anim-hero-header">
+              <span class="anim-hero-label">Dispute intake &amp; chargeback response flow</span>
+            </div>
+            <canvas
+              class="anim-hero-canvas"
+              id="anim-hero"
+              width="720"
+              height="440"
+              aria-label="Shield system animation: dispute notifications arrive from payment providers, Shield asynchronously collects evidence from order, fulfillment, and customer records, then operators finalize chargeback response documents and submit them back to the providers"
+            ></canvas>
+            <div class="anim-hero-footer">
+              <button class="btn-ghost anim-btn anim-btn--full" id="anim-replay" type="button">↺ Replay</button>
+            </div>
           </div>
+        </section>
 
-          <div class="proj-section">
-            <h2>Architecture</h2>
-            <p>
-              Part of a broader microservices ecosystem. Shield listens for
-              dispute events from payment providers via webhooks and pulls
-              evidence from other internal services to build response packages.
-            </p>
-            <div class="proj-arch" style="margin-top: 1.25rem">
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Frontend</div>
-                <div class="proj-arch-val">
-                  Internal UI for operations teams to review auto-collected
-                  evidence, edit documents in a WYSIWYG editor, and submit final
-                  responses to payment providers.
-                </div>
+        <div class="proj-section">
+          <h2>Features</h2>
+          <ul class="proj-features">
+            <li>
+              API for receiving operations requests from internal teams and
+              payment provider webhooks
+            </li>
+            <li>
+              Asynchronous workers to collect evidence from order history,
+              fulfillment records, and customer data
+            </li>
+            <li>
+              Internal UI to review collected evidence and submit final
+              dispute documents
+            </li>
+            <li>
+              PDF generator and WYSIWYG editor for building structured
+              chargeback response documents
+            </li>
+          </ul>
+        </div>
+
+        <div class="proj-section">
+          <h2>Architecture</h2>
+          <p>
+            Part of a broader microservices ecosystem. Shield listens for
+            dispute events from payment providers via webhooks and pulls
+            evidence from other internal services to build response packages.
+          </p>
+          <div class="proj-arch" style="margin-top: 1.25rem">
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Frontend</div>
+              <div class="proj-arch-val">
+                Internal UI for operations teams to review auto-collected
+                evidence, edit documents in a WYSIWYG editor, and submit final
+                responses to payment providers.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">API</div>
-                <div class="proj-arch-val">
-                  Handles webhook ingestion from payment providers and requests
-                  from the frontend. Orchestrates evidence collection and
-                  document generation flows.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">API</div>
+              <div class="proj-arch-val">
+                Handles webhook ingestion from payment providers and requests
+                from the frontend. Orchestrates evidence collection and
+                document generation flows.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Workers</div>
-                <div class="proj-arch-val">
-                  Inngest functions collect evidence asynchronously after a
-                  dispute is received — pulling from order, fulfillment, and
-                  customer records — with retry logic for reliability.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Workers</div>
+              <div class="proj-arch-val">
+                Inngest functions collect evidence asynchronously after a
+                dispute is received — pulling from order, fulfillment, and
+                customer records — with retry logic for reliability.
               </div>
-              <div class="proj-arch-row">
-                <div class="proj-arch-key">Database</div>
-                <div class="proj-arch-val">
-                  MongoDB stores dispute records, collected evidence, document
-                  drafts, and submission history in a flexible document model
-                  suited to varied dispute data shapes.
-                </div>
+            </div>
+            <div class="proj-arch-row">
+              <div class="proj-arch-key">Database</div>
+              <div class="proj-arch-val">
+                MongoDB stores dispute records, collected evidence, document
+                drafts, and submission history in a flexible document model
+                suited to varied dispute data shapes.
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="proj-nav">
-            <a href="scope.html">← Scope</a>
-            <a href="nexus.html">Nexus →</a>
-          </div>
-        </main>
-
-        <!-- SIDEBAR -->
-        <aside class="proj-sidebar fade-up d3">
-          <div class="proj-sidebar-card">
-            <div class="proj-sidebar-top">
-              <div class="proj-sidebar-name">Shield</div>
-              <div class="proj-sidebar-badges">
-                <span class="proj-sidebar-badge accent">Full Stack</span>
-                <span class="proj-sidebar-badge">Production</span>
-                <span class="proj-sidebar-badge">Microservice</span>
+        <section class="proj-section">
+          <h2>Tech Stack</h2>
+          <div class="tech-stack">
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Frontend</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">Next.js</span>
+                <span class="tag hot">React</span>
+                <span class="tag">Tailwind CSS</span>
+                <span class="tag">shadcn/ui</span>
+                <span class="tag">Slate</span>
               </div>
             </div>
-            <div class="proj-sidebar-body">
-              <p class="proj-sidebar-desc">
-                Dispute automation and chargeback prevention — collecting
-                evidence, generating PDF response documents, and submitting them
-                to payment providers automatically.
-              </p>
-              <div>
-                <div class="proj-sidebar-section-label">Frontend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">Next.js</span>
-                  <span class="tag hot">React</span>
-                  <span class="tag">Tailwind CSS</span>
-                  <span class="tag">shadcn/ui</span>
-                  <span class="tag">Slate</span>
-                </div>
-              </div>
-              <div>
-                <div class="proj-sidebar-section-label">Backend</div>
-                <div class="proj-sidebar-tags">
-                  <span class="tag hot">TypeScript</span>
-                  <span class="tag hot">Bun</span>
-                  <span class="tag hot">Elysia.js</span>
-                  <span class="tag hot">Inngest</span>
-                  <span class="tag">MongoDB</span>
-                  <span class="tag">Docker</span>
-                  <span class="tag">GCP</span>
-                </div>
+            <div class="tech-stack-group">
+              <div class="tech-stack-label">Backend</div>
+              <div class="tech-stack-tags">
+                <span class="tag hot">TypeScript</span>
+                <span class="tag hot">Bun</span>
+                <span class="tag hot">Elysia.js</span>
+                <span class="tag hot">Inngest</span>
+                <span class="tag">MongoDB</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GCP</span>
               </div>
             </div>
           </div>
-        </aside>
-      </div>
+        </section>
+
+        <div class="proj-nav">
+          <a href="scope.html">← Scope</a>
+          <a href="nexus.html">Nexus →</a>
+        </div>
+      </article>
     </div>
 
-        <footer>
+    <footer>
       <div class="footer-inner">
         <div class="footer-col">© 2026 Miguel Villalobos</div>
         <div class="footer-col footer-col--center">Built with HTML · CSS · JS · ❤️</div>
@@ -219,5 +226,6 @@
           ),
         );
     </script>
+    <script src="shield.js"></script>
   </body>
 </html>
